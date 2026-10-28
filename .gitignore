@@ -1,0 +1,34 @@
+__pycache__/
+*.pyc
+preview/qa.html
+.toolchains/
+.signing/
+android/.gradle/
+android/local.properties
+android/app/build/
+build/
+
+# Local release outputs and private/device material
+/dist/
+*.jks
+*.keystore
+*.p12
+*.pem
+.env
+.env.*
+!.env.example
+*.log
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+# Optional original catalogue downloads (not required to compile)
+/data/hygdata_v41.csv
+/data/athyg_*.csv.gz
+/data/ATHYG-*.md
+/data/ATHYG-LICENSE.txt
+/vendor/astronomy/package.tgz
+/vendor/astronomy/npm-metadata.json
+/vendor/astronomy/astronomy.js
+/vendor/astronomy/astronomy.d.ts
+/SOURCE-MANIFEST.json

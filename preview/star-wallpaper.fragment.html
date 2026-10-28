@@ -1,0 +1,168 @@
+<div id="starwall-preview" aria-label="星野锁屏壁纸设计预览">
+  <div class="sw-top"><div class="sw-brand"><span class="sw-mark">✦</span><span>星野 <small>STARFIELD</small></span></div><span class="sw-platform">ANDROID 17+ · 设计预览</span></div>
+  <div class="sw-layout">
+    <div class="sw-stage viz-dotted-background">
+      <div class="sw-phone" aria-label="手机锁屏效果">
+        <canvas class="sw-sky" role="img" aria-label="根据真实日期及经纬度计算的星空"></canvas>
+        <canvas class="sw-stars" aria-hidden="true"></canvas>
+        <div class="sw-shade"></div>
+        <div class="sw-camera"></div>
+        <div class="sw-status"><span>中国移动</span><span>5G <span class="sw-battery">86</span></span></div>
+        <div class="sw-clock" aria-label="锁屏时钟">
+          <div class="sw-date"></div>
+          <div class="sw-digital" hidden><span class="sw-hours">00</span><span class="sw-minutes">00</span></div>
+          <canvas class="sw-analog" width="520" height="520" role="img" aria-label="传统指针时钟"></canvas>
+          <div class="sw-clock-caption">此刻，仰望同一片星空</div>
+        </div>
+        <div class="sw-horizon-label"><span class="sw-direction">西北 · 315°</span><span class="sw-coordinates">22.32° N / 114.17° E</span></div>
+        <div class="sw-bottom"><span class="sw-lock"><i data-lucide="lock-keyhole" aria-hidden="true"></i></span><div><div class="sw-place">香港</div><div class="sw-local-date">当地星空 · 实时</div></div><span class="sw-lock"><i data-lucide="sparkles" aria-hidden="true"></i></span></div>
+        <div class="sw-gesture"></div>
+      </div>
+      <div class="sw-caption"><span class="sw-live-dot"></span><span class="sw-render-status" aria-live="polite">正在展开真实星图…</span></div>
+      <div class="sw-scene-info" aria-live="polite"></div>
+    </div>
+    <section class="sw-settings" aria-label="壁纸设置">
+      <div class="sw-section-heading"><h2>你的此刻，你的星空</h2><span>锁屏样式</span></div>
+      <div class="sw-segment" aria-label="时钟样式"><button type="button" class="cursor-interaction" data-clock="analog" aria-pressed="true"><i data-lucide="clock-3" aria-hidden="true"></i> 传统指针</button><button type="button" class="cursor-interaction" data-clock="digital" aria-pressed="false"><i data-lucide="hash" aria-hidden="true"></i> 数字时钟</button></div>
+      <div class="sw-row-label">界面显示</div>
+      <div class="sw-segment" role="group" aria-label="界面显示"><button type="button" class="cursor-interaction" data-ui-mode="standard" aria-pressed="false">标准版</button><button type="button" class="cursor-interaction" data-ui-mode="minimal" aria-pressed="true">精简版</button></div>
+      <div class="sw-control"><label for="sw-magnitude">星等上限 <output id="sw-mag-value">8 等</output></label><input id="sw-magnitude" aria-label="星等上限" type="range" min="3" max="11" step="1" value="8"><div class="sw-range-labels"><span>3 · 明亮简洁</span><span>11 · 深邃繁星</span></div></div>
+      <div class="sw-control"><label for="sw-faint-brightness">暗星亮度 <output id="sw-faint-value">180%</output></label><input id="sw-faint-brightness" aria-label="暗星亮度" type="range" min="50" max="400" step="10" value="180"><div class="sw-range-labels"><span>100% · 原始亮度</span><span>增强 6–11 等暗星</span></div></div>
+      <div class="sw-control"><label for="sw-bright-size">亮星星点 <output id="sw-bright-value">75%</output></label><input id="sw-bright-size" aria-label="亮星星点大小" type="range" min="50" max="100" step="5" value="75"><div class="sw-range-labels"><span>更纤细</span><span>100% · 原大小</span></div></div>
+      <div class="sw-control"><label for="sw-fov">星空视场 <output id="sw-fov-value">150°</output></label><input id="sw-fov" aria-label="星空视场" type="range" min="120" max="180" step="1" value="150"><div class="sw-range-labels"><span>120°</span><span>180° · 对角线视场</span></div></div>
+      <div class="sw-view-settings" role="group" aria-label="视角朝向">
+        <div class="sw-view-heading"><span>视角朝向</span><output class="sw-view-value" aria-live="polite"></output></div>
+        <div class="sw-compass" aria-label="预设视角">
+          <button type="button" class="cursor-interaction" data-azimuth="315" aria-pressed="false">西北</button><button type="button" class="cursor-interaction" data-azimuth="0" aria-pressed="false">北</button><button type="button" class="cursor-interaction" data-azimuth="45" aria-pressed="false">东北</button>
+          <button type="button" class="cursor-interaction" data-azimuth="270" aria-pressed="false">西</button><button type="button" class="sw-zenith cursor-interaction" aria-pressed="false">天顶</button><button type="button" class="cursor-interaction" data-azimuth="90" aria-pressed="false">东</button>
+          <button type="button" class="cursor-interaction" data-azimuth="225" aria-pressed="false">西南</button><button type="button" class="cursor-interaction" data-azimuth="180" aria-pressed="false">南</button><button type="button" class="cursor-interaction" data-azimuth="135" aria-pressed="false">东南</button>
+        </div>
+        <div class="sw-view-actions"><details class="sw-view-angles"><summary class="cursor-interaction">精确角度</summary><div class="sw-control"><label for="sw-azimuth">方位角 <output id="sw-az-value">315°</output></label><input id="sw-azimuth" aria-label="方位角" type="range" min="0" max="359" step="1" value="315"><div class="sw-range-labels"><span>0° 北 · 90° 东</span><span>180° 南 · 270° 西</span></div></div><div class="sw-control"><label for="sw-altitude">仰角 <output id="sw-alt-value">65°</output></label><input id="sw-altitude" aria-label="仰角" type="range" min="0" max="90" step="1" value="65"><div class="sw-range-labels"><span>0° 地平线</span><span>90° 天顶</span></div></div></details><button type="button" class="sw-now sw-frame-galaxy cursor-interaction">朝向当前银河</button></div>
+      </div>
+      <div class="sw-control"><label for="sw-glow">银河光晕 <output id="sw-glow-value">135%</output></label><input id="sw-glow" aria-label="银河光晕" type="range" min="0" max="200" value="135"></div>
+      <div class="sw-control"><label for="sw-dust">暗云层次 <output id="sw-dust-value">75%</output></label><input id="sw-dust" aria-label="暗云层次" type="range" min="0" max="150" value="75"></div>
+      <div class="sw-switches"><label><span><i data-lucide="sparkles" aria-hidden="true"></i> 星点闪烁</span><input id="sw-twinkle" type="checkbox" role="switch" checked></label><label><span><i data-lucide="orbit" aria-hidden="true"></i> 亮星名称</span><input id="sw-labels" type="checkbox" role="switch"></label></div>
+      <details class="sw-celestial-settings" open><summary class="cursor-interaction">星云与月球</summary>
+        <div class="sw-switches"><label><span>真实位置星云</span><input id="sw-nebulae" type="checkbox" role="switch" checked></label><label><span>月球与月相</span><input id="sw-moon" type="checkbox" role="switch" checked></label></div>
+        <div class="sw-control"><label for="sw-nebula-brightness">星云亮度 <output id="sw-nebula-bright-value">140%</output></label><input id="sw-nebula-brightness" aria-label="星云亮度" type="range" min="0" max="250" step="10" value="140"></div>
+        <div class="sw-control"><label for="sw-nebula-size">星云显示尺寸 <output id="sw-nebula-size-value">2.5×</output></label><input id="sw-nebula-size" aria-label="星云显示尺寸" type="range" min="100" max="400" step="10" value="250"></div>
+        <div class="sw-control"><label for="sw-moon-size">月球显示尺寸 <output id="sw-moon-value">8×</output></label><input id="sw-moon-size" aria-label="月球显示尺寸" type="range" min="1" max="12" step="1" value="8"><div class="sw-range-labels"><span>1× · 真实角直径</span><span>艺术放大</span></div></div>
+        <div class="sw-moon-status" aria-live="polite"></div>
+        <div class="sw-celestial-actions"><button type="button" class="sw-now sw-focus-moon cursor-interaction">朝向月球</button><button type="button" class="sw-now sw-night-example cursor-interaction">夜景示例</button></div>
+      </details>
+      <div class="sw-divider"></div>
+      <div class="sw-row-label"><label for="sw-city">观测位置</label><span class="sw-location-kind">手动预设</span></div>
+      <select id="sw-city" aria-label="观测位置"><option value="hongkong">香港 · 中国</option><option value="lhasa">拉萨 · 中国</option><option value="lijiang">丽江 · 中国</option><option value="sydney">悉尼 · 澳大利亚</option><option value="atacama">阿塔卡马 · 智利</option><option value="reykjavik">雷克雅未克 · 冰岛</option><option value="custom">自定义经纬度</option></select>
+      <div class="sw-row-label sw-time-row"><label for="sw-datetime">日期与时间</label><button type="button" class="sw-now sw-realtime cursor-interaction">回到此刻</button></div>
+      <input id="sw-datetime" type="datetime-local" aria-label="当地日期与时间" min="1900-01-01T00:00" max="2100-12-31T23:59">
+      <div class="sw-timezone-label">当地时间 · <span class="sw-zone-label">Asia/Hong_Kong</span></div>
+      <details class="sw-advanced"><summary class="cursor-interaction">位置与时区 <i data-lucide="sliders-horizontal" aria-hidden="true"></i></summary><div class="sw-coordinate-inputs"><label>纬度 °<input id="sw-lat" aria-label="纬度" type="number" min="-90" max="90" step="0.001" value="22.319"></label><label>经度 °<input id="sw-lon" aria-label="经度" type="number" min="-180" max="180" step="0.001" value="114.169"></label></div><label class="sw-zone-control">当地时区<select id="sw-zone" aria-label="当地时区"><option>Asia/Hong_Kong</option><option>Asia/Shanghai</option><option>Australia/Sydney</option><option>America/Santiago</option><option>Atlantic/Reykjavik</option><option>UTC</option></select></label></details>
+      <div class="sw-error" role="alert" hidden></div>
+      <details class="sw-data-note"><summary class="cursor-interaction">星图数据与预览说明</summary><div>HYG v4.1 · 115,570 颗真实恒星。星等控制显示上限，星表在暗星端并不完备。银河按真实银道定位，光晕与暗云为程序化艺术增强。预览不模拟日光、月光照亮天空和城市光污染。</div><div>12 处星云按 OpenNGC 真实坐标定位，色彩、纹理为艺术表现；尺寸可设为 1×。月球采用 Astronomy Engine 2.1.19 离线计算观测位置、月相及天平动，表面来自 NASA LROC 月面图；显示尺寸可放大，地平线下不显示。</div><div>预览展示壁纸内绘制时钟，未模拟系统锁屏时钟。普通壁纸 App 无法隐藏系统时钟，正式版需提供兼容布局，并按机型验证。</div><div>数据：David Nash / HYG、Mattia Verga / OpenNGC，CC BY-SA 4.0；Don Cross / Astronomy Engine，MIT；NASA SVS / Ernie Wright、LROC / LOLA 月球纹理。</div></details>
+    </section>
+  </div>
+</div>
+<style>
+#starwall-preview{--sw-ink:#f1eee8;--sw-muted:#a1a5b5;--sw-gold:#d9c59e;--sw-panel:#10141d;--sw-line:#ffffff14;--sw-accent:#dfcba8;color-scheme:dark;color:var(--sw-ink);font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#0c1018;border-radius:22px;padding:24px;box-sizing:border-box;isolation:isolate}
+#starwall-preview *{box-sizing:border-box}
+#starwall-preview [hidden]{display:none!important}
+#starwall-preview[data-ui-mode=minimal] .sw-status,#starwall-preview[data-ui-mode=minimal] .sw-clock-caption,#starwall-preview[data-ui-mode=minimal] .sw-horizon-label,#starwall-preview[data-ui-mode=minimal] .sw-bottom,#starwall-preview[data-ui-mode=minimal] .sw-gesture,#starwall-preview[data-ui-mode=minimal] .sw-caption{display:none!important}
+#starwall-preview #sw-labels:disabled{opacity:.4}
+#starwall-preview button,#starwall-preview input,#starwall-preview select{font:inherit}
+#starwall-preview .sw-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+#starwall-preview .sw-brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:500;letter-spacing:3px}
+#starwall-preview .sw-mark{font-size:29px;color:var(--sw-gold)}
+#starwall-preview .sw-brand small{display:block;font-size:9px;letter-spacing:3px;color:var(--sw-muted);margin-top:2px}
+#starwall-preview .sw-platform{font-size:10px;letter-spacing:1.2px;color:var(--sw-muted);padding-right:70px}
+#starwall-preview .sw-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:28px;align-items:start}
+#starwall-preview .sw-stage{display:flex;flex-direction:column;align-items:center;padding:6px 0 0;min-width:0}
+#starwall-preview .sw-phone{width:100%;max-width:328px;aspect-ratio: .475;position:relative;overflow:hidden;border:6px solid #242a36;border-radius:39px;background:#060b17;box-shadow:0 20px 44px #0006,0 0 0 1px #727a8938;container-type:inline-size}
+#starwall-preview .sw-sky,#starwall-preview .sw-stars,#starwall-preview .sw-shade{position:absolute;inset:0;width:100%;height:100%;display:block}
+#starwall-preview .sw-shade{background:linear-gradient(180deg,#03061388 0%,#03061310 24%,transparent 51%,#03061308 65%,#030613b0 100%);pointer-events:none}
+#starwall-preview .sw-camera{position:absolute;top:11px;left:calc(50% - 5px);width:10px;height:10px;background:#020308;border-radius:50%;box-shadow:inset 0 0 0 2px #171c29}
+#starwall-preview .sw-status{position:absolute;left:20px;right:20px;top:17px;display:flex;align-items:center;justify-content:space-between;font-size:9px;letter-spacing:.5px;opacity:.85}
+#starwall-preview .sw-battery{font-size:8px;padding:1px 4px;border:1px solid #ece8dd8f;border-radius:3px;margin-left:4px}
+#starwall-preview .sw-clock{position:absolute;top:13%;width:100%;text-align:center;color:#f2eddf;text-shadow:0 2px 22px #0005;transform-origin:top center}
+#starwall-preview .sw-date{font-size:12px;letter-spacing:1.4px;margin-bottom:12px;font-weight:400}
+#starwall-preview .sw-analog{width:75%;height:auto;margin:0 auto;display:block;filter:drop-shadow(0 4px 12px #0005)}
+#starwall-preview .sw-clock-caption{font-size:9px;letter-spacing:2.2px;opacity:.63;margin-top:9px}
+#starwall-preview .sw-digital{display:flex;align-items:center;flex-direction:column;font-family:"Segoe UI Light","Helvetica Neue",sans-serif;font-size:clamp(70px,33cqw,106px);font-weight:300;line-height:.88;letter-spacing:-5px;padding:10px 0 16px}
+#starwall-preview .sw-digital span:last-child{color:#ddd3be;margin-top:6px}
+#starwall-preview .sw-horizon-label{position:absolute;bottom:123px;left:0;right:0;display:flex;align-items:center;gap:8px;flex-direction:column;color:#e4dfd0a8;font-size:8px;letter-spacing:2px}
+#starwall-preview .sw-coordinates{font-size:7px;letter-spacing:1.4px;opacity:.8}
+#starwall-preview .sw-bottom{position:absolute;bottom:42px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;text-align:center;gap:8px}
+#starwall-preview .sw-lock{width:35px;height:35px;background:#c8d0e414;border:1px solid #d6deef16;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#starwall-preview .sw-lock svg{width:14px;height:14px;opacity:.75}
+#starwall-preview .sw-place{font-size:13px;letter-spacing:4px;margin-bottom:5px}
+#starwall-preview .sw-local-date{font-size:8px;letter-spacing:1.2px;color:#c0c6d0}
+#starwall-preview .sw-gesture{position:absolute;bottom:13px;width:29%;height:3px;background:#f3eddeaa;border-radius:4px;left:35.5%}
+#starwall-preview .sw-caption{display:flex;gap:7px;align-items:center;text-align:center;font-size:10px;line-height:1.6;color:var(--sw-muted);margin-top:17px;min-height:17px}
+#starwall-preview .sw-live-dot{width:5px;height:5px;border-radius:50%;background:#c4d5bf;flex-shrink:0}
+#starwall-preview .sw-scene-info{font-size:11px;color:var(--sw-muted);text-align:center;margin-top:14px;line-height:1.7;max-width:100%}
+#starwall-preview .sw-celestial-settings{margin-bottom:20px}
+#starwall-preview .sw-celestial-settings .sw-switches{margin-top:14px}
+#starwall-preview .sw-moon-status{font-size:11px;color:var(--sw-muted);line-height:1.8}
+#starwall-preview .sw-celestial-actions{display:flex;justify-content:space-between;gap:10px;margin-top:7px}
+#starwall-preview button:disabled{opacity:.4;cursor:default}
+#starwall-preview .sw-section-heading{margin-bottom:17px}
+#starwall-preview h2{font-size:17px;font-weight:400;letter-spacing:1px;margin:0 0 7px}
+#starwall-preview .sw-section-heading>span{font-size:11px;color:var(--sw-muted)}
+#starwall-preview .sw-settings{min-width:0;padding-top:7px}
+#starwall-preview .sw-segment{display:flex;background:#1b202b;border-radius:10px;padding:4px;gap:3px;margin-bottom:23px}
+#starwall-preview .sw-segment button{border:0;border-radius:7px;background:transparent;color:#aab0bd;font-size:11px;display:flex;gap:5px;justify-content:center;align-items:center;flex:1;padding:11px 3px;white-space:nowrap;transition:background .2s,color .2s}
+#starwall-preview .sw-segment button[aria-pressed=true]{background:#dfcfb0;color:#24252a;box-shadow:0 2px 7px #0002}
+#starwall-preview .sw-segment svg{width:13px;height:13px}
+#starwall-preview .sw-control{margin-bottom:17px}
+#starwall-preview .sw-control>label{display:flex;justify-content:space-between;gap:8px;font-size:11px;align-items:center;margin-bottom:8px}
+#starwall-preview output{font-size:11px;color:var(--sw-gold);font-variant-numeric:tabular-nums}
+#starwall-preview input[type=range]{display:block;width:100%;accent-color:var(--sw-accent);height:13px;margin:0;cursor:ew-resize}
+#starwall-preview .sw-range-labels{display:flex;justify-content:space-between;gap:4px;margin-top:6px;font-size:9px;color:var(--sw-muted)}
+#starwall-preview .sw-view-settings{margin:4px 0 20px;padding:14px 0;border-top:1px solid var(--sw-line);border-bottom:1px solid var(--sw-line)}
+#starwall-preview .sw-view-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11px;margin-bottom:10px;flex-wrap:wrap}
+#starwall-preview .sw-view-value{font-size:10px;overflow-wrap:anywhere}
+#starwall-preview .sw-compass{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#starwall-preview .sw-compass button{min-height:34px;border:1px solid #ffffff12;border-radius:7px;color:#c5c9d2;background:#181e2a;font-size:11px;padding:7px 4px}
+#starwall-preview .sw-compass button[aria-pressed=true]{background:#dfcfb0;border-color:#dfcfb0;color:#24252a}
+#starwall-preview .sw-compass .sw-zenith{background:#232a36;color:var(--sw-gold)}
+#starwall-preview .sw-view-actions{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px}
+#starwall-preview .sw-view-angles{border:0;padding:0;margin:0;flex:1;min-width:0}
+#starwall-preview .sw-view-angles[open]{flex-basis:100%}
+#starwall-preview .sw-view-angles .sw-control{margin-top:13px;margin-bottom:13px}
+#starwall-preview .sw-view-angles summary{color:var(--sw-muted);font-size:11px}
+#starwall-preview .sw-frame-galaxy{white-space:nowrap;font-size:11px}
+#starwall-preview .sw-switches{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:2px 0 20px}
+#starwall-preview .sw-switches label{display:flex;align-items:center;justify-content:space-between;gap:3px;font-size:10px;min-height:25px}
+#starwall-preview .sw-switches label>span{display:flex;align-items:center;gap:4px}
+#starwall-preview .sw-switches svg{width:12px;height:12px;color:var(--sw-muted)}
+#starwall-preview input[role=switch]{appearance:none;width:27px;height:16px;border-radius:20px;background:#353d4b;position:relative;flex-shrink:0;margin:0;transition:background .2s}
+#starwall-preview input[role=switch]::after{content:"";width:12px;height:12px;border-radius:50%;background:#cbd0da;position:absolute;top:2px;left:2px;transition:transform .2s}
+#starwall-preview input[role=switch]:checked{background:#cab997}
+#starwall-preview input[role=switch]:checked::after{transform:translateX(11px);background:#252a32}
+#starwall-preview .sw-divider{height:1px;background:var(--sw-line);margin-bottom:18px}
+#starwall-preview .sw-row-label{display:flex;align-items:center;justify-content:space-between;font-size:11px;gap:8px;margin-bottom:8px}
+#starwall-preview .sw-location-kind{font-size:9px;color:var(--sw-muted)}
+#starwall-preview select,#starwall-preview input[type=datetime-local],#starwall-preview input[type=number]{border:1px solid #ffffff18;background:#181d28;color:#e5e5eb;border-radius:8px;width:100%;padding:10px;font-size:11px;min-width:0}
+#starwall-preview select{padding-right:18px}
+#starwall-preview .sw-time-row{margin-top:16px}
+#starwall-preview .sw-now{border:0;background:none;color:var(--sw-gold);font-size:10px;padding:3px 0}
+#starwall-preview .sw-timezone-label{font-size:9px;color:var(--sw-muted);margin:7px 0 14px;overflow-wrap:anywhere}
+#starwall-preview details{border-top:1px solid var(--sw-line);padding-top:11px;margin-top:10px;font-size:10px;color:var(--sw-muted)}
+#starwall-preview summary{display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;min-height:22px}
+#starwall-preview summary::after{content:"＋";color:var(--sw-gold);font-size:13px}
+#starwall-preview details[open]>summary::after{content:"−"}
+#starwall-preview summary svg{width:12px;height:12px;margin-left:auto}
+#starwall-preview .sw-coordinate-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;margin-bottom:10px}
+#starwall-preview .sw-coordinate-inputs input,#starwall-preview .sw-zone-control select{margin-top:5px}
+#starwall-preview .sw-zone-control{display:block;margin-bottom:14px}
+#starwall-preview .sw-data-note>div{font-size:10px;line-height:1.8;margin-top:10px}
+#starwall-preview .sw-error{color:#ffb3ab;font-size:11px;line-height:1.7;margin:8px 0}
+@media(max-width:590px){#starwall-preview{padding:19px 16px}#starwall-preview .sw-layout{grid-template-columns:1fr;gap:28px}#starwall-preview .sw-platform{padding-right:65px;font-size:9px}#starwall-preview .sw-settings{width:100%;max-width:380px;margin:auto}#starwall-preview .sw-phone{max-width:310px}#starwall-preview .sw-segment button{font-size:13px}#starwall-preview .sw-control>label,#starwall-preview .sw-row-label{font-size:13px}#starwall-preview .sw-range-labels,#starwall-preview details,#starwall-preview .sw-switches label,#starwall-preview .sw-timezone-label{font-size:11px}#starwall-preview .sw-data-note>div{font-size:11px}#starwall-preview .sw-switches label{min-height:44px}#starwall-preview select,#starwall-preview input[type=datetime-local],#starwall-preview input[type=number]{font-size:16px}#starwall-preview summary{min-height:36px}#starwall-preview .sw-control{margin-bottom:22px}}
+@media(prefers-reduced-motion:reduce){#starwall-preview *{transition:none!important}}
+@media(pointer:coarse){#starwall-preview input[type=range]{height:44px}#starwall-preview .sw-segment button,#starwall-preview .sw-compass button,#starwall-preview .sw-switches label,#starwall-preview summary,#starwall-preview select,#starwall-preview input[type=datetime-local],#starwall-preview input[type=number],#starwall-preview .sw-now{min-height:44px}#starwall-preview input[type=datetime-local],#starwall-preview input[type=number],#starwall-preview select{font-size:16px}}
+</style>
+<!-- SKY_MATH -->
+<!-- ASTRONOMY -->
+<!-- CATALOGUE -->
+<!-- CELESTIAL_DATA -->
+<!-- CELESTIAL_MATH -->
+<!-- PREVIEW_SCRIPT -->

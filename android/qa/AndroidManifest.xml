@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.starfield.wallpaper.test" android:versionCode="1" android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="37" android:targetSdkVersion="37"/>
+    <application android:label="Starfield QA" android:debuggable="true" />
+    <instrumentation android:name="app.starfield.wallpaper.test.SmokeInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield native QA" />
+    <instrumentation android:name="app.starfield.wallpaper.test.WallpaperInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield system wallpaper QA" />
+    <instrumentation android:name="app.starfield.wallpaper.test.LocationInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield synthetic GPS QA" />
+    <instrumentation android:name="app.starfield.wallpaper.test.UpgradeSeedInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield upgrade fixture" />
+    <instrumentation android:name="app.starfield.wallpaper.test.BrightnessInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield dark-star pixels QA" />
+    <instrumentation android:name="app.starfield.wallpaper.test.CelestialInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Celestial pixel QA" />
+</manifest>

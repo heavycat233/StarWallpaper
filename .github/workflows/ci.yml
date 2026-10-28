@@ -1,0 +1,44 @@
+name: Source checks and Android build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs
+      - run: python tools/verify_android_catalog.py
+      - run: python tools/verify_open_source.py
+      - run: python tools/build_preview.py
+  android:
+    needs: verify
+    runs-on: windows-latest
+    timeout-minutes: 35
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python tools/bootstrap_android.py
+      - run: python tools/build_android.py
+      - run: python tools/build_android_qa.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starfield-test-apk-temporary-signature
+          path: |
+            dist/*.apk
+            dist/SHA256SUMS.txt
+          retention-days: 7

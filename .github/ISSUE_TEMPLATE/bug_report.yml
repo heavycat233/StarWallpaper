@@ -1,0 +1,21 @@
+name: Bug report / 问题报告
+description: 报告显示、定位或兼容性问题
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: App 版本、Android 版本、机型
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤和预期表现
+      description: 星空差异请同时注明日期、时区、手动城市、视角、星等、亮度和 FOV；不要提交真实精确位置或隐私日志。
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或补充信息

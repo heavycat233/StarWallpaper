@@ -1,0 +1,9 @@
+name: Feature request / 功能建议
+description: 提出使用场景与改进建议
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 使用场景、期望行为与原因
+    validations:
+      required: true
