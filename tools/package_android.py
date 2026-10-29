@@ -23,6 +23,13 @@ with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
 with zipfile.ZipFile(out) as archive:
     assert archive.testzip() is None
 report={'version':version,'applicationId':'app.starfield.wallpaper','minSdk':37,'targetSdk':37,'compileSdk':37,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':checksum,'catalogue':115570,'catalogueSource':'HYG v4.1, exact preview records','sourceArchive':out.name,'signing':'local RSA-3072 APK Signature Scheme v3','tested':'Android 17 / API 37 emulator; star-name and constellation controls; GLES pixel changes for names, lines and twinkle strength; exact Android/preview HYG and constellation data; native coordinate tests','notYetValidated':'OEM physical devices, AOD, long-duration battery measurements'}
+android16=DIST/f'starwallpaper-{version}-android16.apk'
+if android16.is_file():
+    expected16=(DIST/'SHA256SUMS-android16.txt').read_text(encoding='ascii').split()[0]
+    actual16=hashlib.sha256(android16.read_bytes()).hexdigest()
+    assert actual16==expected16
+    report['android16']={'apk':android16.name,'bytes':android16.stat().st_size,'sha256':actual16,'minSdk':36,'targetSdk':36,'compileSdk':36}
+    report['tested']+='; Android 16 / API 36 emulator: annotation and celestial GLES pixel regressions'
 (DIST/'BUILD-INFO.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
 print('Verified APK: '+checksum)
 print('Source archive: '+str(out)+f' ({out.stat().st_size:,} bytes)')

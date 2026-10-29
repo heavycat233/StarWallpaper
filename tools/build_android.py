@@ -1,4 +1,4 @@
-"""Repeatable dependency-free Android 17 build using official aapt2/javac/D8/apksigner.
+"""Repeatable dependency-free Android 17/16 build using official aapt2/javac/D8/apksigner.
 
 The local signing key is generated once, kept under ignored .signing/, and never printed.
 """
@@ -23,16 +23,20 @@ def run(args,**kwargs):
     result=subprocess.run([str(a) for a in args],cwd=ROOT,env=ENV,check=True,**kwargs)
     return result
 
-def build():
+def build(min_api=37):
+    if min_api not in (36,37):raise ValueError('Supported Android API levels: 36, 37')
+    for folder in [BUILD,BUILD/'classes',BUILD/'generated',BUILD/'dex']:folder.mkdir(parents=True,exist_ok=True)
     # AGP uses the Gradle namespace. aapt2's direct CLI instead needs the package
     # in its input manifest, so only the temporary build copy receives it.
     ET.register_namespace('android','http://schemas.android.com/apk/res/android')
     manifest=ET.parse(SRC/'AndroidManifest.xml')
     manifest.getroot().set('package','app.starfield.wallpaper')
+    uses=manifest.getroot().find('uses-sdk');android='{http://schemas.android.com/apk/res/android}'
+    uses.set(android+'minSdkVersion',str(min_api));uses.set(android+'targetSdkVersion',str(min_api))
     manifest.write(BUILD/'AndroidManifest.xml',encoding='utf-8',xml_declaration=True)
     print('Compiling Android resources',flush=True)
     run([TOOLS/'aapt2.exe','compile','--dir',SRC/'res','-o',BUILD/'resources.zip'])
-    run([TOOLS/'aapt2.exe','link','-o',BUILD/'resources.apk','--manifest',BUILD/'AndroidManifest.xml','-I',PLATFORM,'--java',BUILD/'generated','--auto-add-overlay','--min-sdk-version','37','--target-sdk-version','37',BUILD/'resources.zip'])
+    run([TOOLS/'aapt2.exe','link','-o',BUILD/'resources.apk','--manifest',BUILD/'AndroidManifest.xml','-I',PLATFORM,'--java',BUILD/'generated','--auto-add-overlay','--min-sdk-version',str(min_api),'--target-sdk-version',str(min_api),BUILD/'resources.zip'])
     sources=sorted((SRC/'java').rglob('*.java'))+sorted((BUILD/'generated').rglob('*.java'))
     arguments=BUILD/'javac.args';arguments.write_text('\n'.join('"'+str(p).replace('\\','/')+'"' for p in sources),encoding='utf-8')
     print('Compiling native Android app',flush=True)
@@ -40,8 +44,7 @@ def build():
     with zipfile.ZipFile(BUILD/'classes.jar','w',zipfile.ZIP_DEFLATED) as archive:
         for source in sorted((BUILD/'classes').rglob('*.class')):archive.write(source,source.relative_to(BUILD/'classes').as_posix())
     print('Producing Dalvik bytecode',flush=True)
-    # Build Tools 37 bundles a D8 that warns about a 37 instruction floor. API 36
-    # instructions are compatible with 37; installation remains min/target 37.
+    # API 36 bytecode works on both supported runtime variants.
     run([JDK/'bin/java.exe','-cp',TOOLS/'lib/d8.jar','com.android.tools.r8.D8','--release','--min-api','36','--lib',PLATFORM,'--output',BUILD/'dex',BUILD/'classes.jar'])
     with zipfile.ZipFile(BUILD/'resources.apk') as resources,zipfile.ZipFile(BUILD/'unsigned.apk','w',zipfile.ZIP_DEFLATED) as archive:
         for item in resources.infolist():archive.writestr(item,resources.read(item.filename))
@@ -54,13 +57,15 @@ def build():
     ENV['STARFIELD_SIGN_PASSWORD']=json.loads(passwordFile.read_text())['password']
     if not key.is_file():
         run([JDK/'bin/keytool.exe','-genkeypair','-keystore',key,'-storetype','JKS','-alias','starfield','-keyalg','RSA','-keysize','3072','-validity','10000','-dname','CN=Starfield Local Build, OU=Development, O=Starfield','-storepass:env','STARFIELD_SIGN_PASSWORD','-keypass:env','STARFIELD_SIGN_PASSWORD','-noprompt'],capture_output=True)
-    output=DIST/f'starwallpaper-{VERSION}-android17.apk'
+    variant='android16' if min_api==36 else 'android17'
+    output=DIST/f'starwallpaper-{VERSION}-{variant}.apk'
     run([JDK/'bin/java.exe','-jar',TOOLS/'lib/apksigner.jar','sign','--ks',key,'--ks-key-alias','starfield','--ks-pass','env:STARFIELD_SIGN_PASSWORD','--key-pass','env:STARFIELD_SIGN_PASSWORD','--out',output,BUILD/'aligned.apk'])
     result=run([JDK/'bin/java.exe','-jar',TOOLS/'lib/apksigner.jar','verify','--verbose','--print-certs',output],capture_output=True,text=True)
-    (DIST/'APK-SIGNATURE.txt').write_text(result.stdout,encoding='utf-8');print(result.stdout,flush=True)
-    digest=hashlib.sha256(output.read_bytes()).hexdigest();(DIST/'SHA256SUMS.txt').write_text(digest+'  '+output.name+'\n',encoding='ascii')
+    suffix='-android16' if min_api==36 else ''
+    (DIST/f'APK-SIGNATURE{suffix}.txt').write_text(result.stdout,encoding='utf-8');print(result.stdout,flush=True)
+    digest=hashlib.sha256(output.read_bytes()).hexdigest();(DIST/f'SHA256SUMS{suffix}.txt').write_text(digest+'  '+output.name+'\n',encoding='ascii')
     metadata=run([TOOLS/'aapt2.exe','dump','badging',output],capture_output=True,text=True,encoding='utf-8')
-    (DIST/'APK-METADATA.txt').write_text(metadata.stdout,encoding='utf-8')
+    (DIST/f'APK-METADATA{suffix}.txt').write_text(metadata.stdout,encoding='utf-8')
     print('Built '+str(output)+f' ({output.stat().st_size:,} bytes)',flush=True)
     print('SHA256 '+digest,flush=True)
 if __name__=='__main__':build()

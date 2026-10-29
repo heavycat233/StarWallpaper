@@ -1,6 +1,6 @@
 # starwallpaper：Android 原生版设计基线
 
-状态：原生 App 与已签名 APK 已实现。Android 17 / API 37 模拟器已完成安装、启动、图形与系统动态壁纸应用验证。厂商真机、AOD 和长期耗电尚待验证。
+状态：原生 App 与已签名 APK 已实现。Android 16 / API 36 与 Android 17 / API 37 模拟器已完成安装及图形回归；Android 17 还验证了系统动态壁纸应用。厂商真机、AOD 和长期耗电尚待验证。
 
 ## 体验
 
@@ -12,9 +12,9 @@
 
 界面显示独立提供“标准版 / 精简版”，两种时钟均可使用。精简版的壁纸绘制层只显示时间、日期和星空，不绘制地点、方位、坐标、文案、亮星名称或星座名称；预览中的模拟状态栏和底部快捷图标也一并隐藏。开启任一文字标注时自动切到标准版。设置页始终保留完整控制，界面模式随用户偏好保存。原生系统自带的状态栏、解锁控件等仍由系统管理，不将网页预览中的隐藏效果视为系统接口能力。
 
-## Android 17+ 平台
+## Android 16+ 平台
 
-- `minSdk = 37`，`compileSdk = 37`，初始 `targetSdk = 37`；只使用稳定 SDK。Android 17 的 SDK 数字已查阅官方文档。未来 Android 大版本需要回归验证，不能预先保证零适配。
+- Android 17 包的最低/编译/目标级别均为 API 37；Android 16 独立包的三者均为 API 36。Gradle 工程保持 Android 17 默认配置，Android 16 包由单独脚本用官方 SDK 36 生成。未来 Android 大版本需要回归验证，不能预先保证零适配。
 - Java 原生控件设置界面与 `WallpaperService.Engine` 分离；设置通过 SharedPreferences 在本机持久化。没有 WebView 和第三方运行依赖。
 - 动态壁纸引擎通过 `SurfaceHolder`、独立 EGL 线程与 OpenGL ES 3.0 绘制；设置和全屏预览共用同一套原生渲染器。
 - 通过系统动态壁纸预览入口让用户应用。锁屏、桌面或两者的可选项由系统壁纸选择器与厂商实现决定。
@@ -23,6 +23,7 @@
 官方资料：
 
 - [Android 17 SDK 配置](https://developer.android.com/about/versions/17/setup-sdk)
+- [Android 16 SDK 配置](https://developer.android.com/about/versions/16/setup-sdk)
 - [WallpaperService.Engine：可见性、Surface、壁纸标志](https://developer.android.com/reference/android/service/wallpaper/WallpaperService.Engine)
 - [WallpaperManager：系统壁纸入口](https://developer.android.com/reference/android/app/WallpaperManager)
 
@@ -76,6 +77,6 @@
 
 ## 原生验收
 
-已完成：原生数学基准与 453 个投影样本、93.8 万条二进制数据完整性与每个星等切点、API / 权限清单、Android 17 模拟器安装启动、GLES 着色器、天空像素、两类时钟、标准 / 精简界面、预览暂停停止绘制、系统选择器实际应用动态壁纸，以及合成 GPS 验证 LocationManager 回调、坐标保存与关闭跟随后使用手动位置。
+已完成：原生数学基准与 453 个投影样本、115,570 颗恒星的二进制数据完整性与每个星等切点、API / 权限清单、Android 16 和 17 模拟器安装启动、GLES 着色器、天空像素、两类时钟、标准 / 精简界面、预览暂停停止绘制；Android 17 上还验证了系统选择器实际应用动态壁纸，以及合成 GPS 的 LocationManager 回调、坐标保存与关闭跟随后使用手动位置。
 
 仍需真机验证：各厂商系统时钟与 AOD、后台定位节电差异、锁屏切换细节、图形内存、耗电和长时间运行。当前版本为 1.2.3；没有以模拟器帧率冒充手机耗电指标。

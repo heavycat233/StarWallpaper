@@ -1,6 +1,6 @@
 # GitHub 发布说明
 
-公开仓库：[`heavycat233/StarWallpaper`](https://github.com/heavycat233/StarWallpaper)。建议描述为“Offline real-sky live wallpaper for Android 17+, with HYG stars, nebulae and lunar phases”。
+公开仓库：[`heavycat233/StarWallpaper`](https://github.com/heavycat233/StarWallpaper)。建议描述为“Offline real-sky live wallpaper for Android 16+, with HYG stars, nebulae and lunar phases”。
 
 首次上传前运行 `python tools/verify_open_source.py` 并检查 `git diff --cached --stat`。只提交发布清单内的文件；私钥、构建缓存和历史大数据保留在本机忽略目录。
 

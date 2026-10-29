@@ -1,8 +1,8 @@
 # starwallpaper
 
-Android 17+ 原生星空动态壁纸：在锁屏上显示与日期、地点相对应的星空、月球与时钟。Java + OpenGL ES 3.0，离线运行，无广告、账号、分析上传或互联网权限。
+Android 16+ 原生星空动态壁纸：在锁屏上显示与日期、地点相对应的星空、月球与时钟。Java + OpenGL ES 3.0，离线运行，无广告、账号、分析上传或互联网权限。
 
-**当前版本：1.2.3 · 最低/目标/编译 API：37 · 自有代码：MIT**
+**当前版本：1.2.3 · Android 16 / API 36 与 Android 17 / API 37 各有独立安装包 · 自有代码：MIT**
 
 ![原生夜景效果](docs/screenshots/night.png)
 
@@ -35,13 +35,16 @@ Windows、Python 3.11+：
 
 ```powershell
 python tools/bootstrap_android.py
+python tools/bootstrap_android16.py
 python tools/verify_android_catalog.py
 python tools/build_android.py
+python tools/build_android16.py
+python tools/verify_android16.py
 ```
 
-输出：`dist/starwallpaper-1.2.3-android17.apk`。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
+输出：`dist/starwallpaper-1.2.3-android17.apk` 与 `dist/starwallpaper-1.2.3-android16.apk`。Android 16 设备选后者；Android 17 设备优先选前者。两个包使用相同安装标识与签名，不能同时安装。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
 
-也可用 Android Studio 打开 `android/`，指定 JDK 17+ 和 SDK 37；工程声明 AGP 9.1.1，需要 Gradle 9.3.1。仓库未附 Gradle Wrapper；已验证的命令行流水线是上述 Windows 脚本。完整说明见 [构建、测试与数据重建](docs/BUILDING.md)。
+也可用 Android Studio 打开 `android/`，指定 JDK 17+ 和 SDK 37；Gradle 工程默认构建 Android 17 包。Android 16 包由 `tools/build_android16.py` 使用官方 SDK 36 独立构建。工程声明 AGP 9.1.1，需要 Gradle 9.3.1。仓库未附 Gradle Wrapper；已验证的命令行流水线是上述 Windows 脚本。完整说明见 [构建、测试与数据重建](docs/BUILDING.md)。
 
 ## 查看交互预览
 
@@ -79,4 +82,4 @@ GitHub Actions 配置了数学测试、数据/发布检查和 Windows 原生构�
 
 银河与星云色彩/纹理经过艺术增强，星云和月球默认采用艺术放大，均可调回真实角尺寸。白天仍显示星空，未模拟日光、月光照亮天空、折射和光污染；星图用于壁纸效果，不用于精密观测。不同屏幕比例、字体与抗锯齿会影响最终画面。
 
-已完成 Android 17 模拟器上的安装、渲染、覆盖更新和指定场景像素校验；厂商真机、AOD 与长期耗电仍需验证。定位信息仅在设备本地处理，拒绝授权时仍可手动使用。
+已完成 Android 16 与 17 模拟器上的安装、渲染和指定场景像素校验；17 版还验证了覆盖更新。厂商真机、AOD 与长期耗电仍需验证。定位信息仅在设备本地处理，拒绝授权时仍可手动使用。

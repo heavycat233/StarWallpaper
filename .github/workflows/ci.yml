@@ -35,10 +35,14 @@ jobs:
       - run: python tools/bootstrap_android.py
       - run: python tools/build_android.py
       - run: python tools/build_android_qa.py
+      - run: python tools/bootstrap_android16.py
+      - run: python tools/build_android16.py
+      - run: python tools/verify_android16.py
+      - run: python tools/build_android16_qa.py
       - uses: actions/upload-artifact@v4
         with:
-          name: starfield-test-apk-temporary-signature
+          name: starwallpaper-test-apks-temporary-signature
           path: |
             dist/*.apk
-            dist/SHA256SUMS.txt
+            dist/SHA256SUMS*.txt
           retention-days: 7

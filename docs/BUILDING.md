@@ -6,26 +6,31 @@
 
 ```powershell
 python tools/bootstrap_android.py
+python tools/bootstrap_android16.py
 python tools/verify_android_catalog.py
 python tools/build_android.py
 python tools/build_android_qa.py
+python tools/build_android16.py
+python tools/verify_android16.py
+python tools/build_android16_qa.py
 ```
 
-bootstrap 从官方来源获取 JDK 21、SDK 37、Build Tools 37 和 platform-tools，并按供应方摘要校验。需要网络与相应磁盘空间。构建本身使用 aapt2、javac、D8、zipalign 和 apksigner，无需 Gradle 或重新生成天文数据。D8 使用兼容的 API 36 指令下限，安装/目标 API 仍为 37。
+bootstrap 从官方来源获取 JDK 21、SDK 37 / 36、Build Tools 37 / 36 和 platform-tools，并按供应方摘要校验。需要网络与相应磁盘空间。构建本身使用 aapt2、javac、D8、zipalign 和 apksigner，无需 Gradle 或重新生成天文数据。Android 17 包最低/目标/编译 API 为 37；Android 16 包三者均为 36。
 
 APK、摘要和签名信息输出到 `dist/`。`.signing/` 自动生成私钥及本地构建密码，必须自行保管，不提交或上传。未附维护者私钥，其他人的构建不能覆盖维护者签名的安装。开发中更换签名时，需在测试设备卸载旧安装或使用独立 applicationId。
 
-Android Studio 工程在 `android/`，声明 AGP 9.1.1、Gradle 9.3.1、Java 17、SDK 37；仓库不附 Gradle Wrapper。普通发布以已验证的 Windows 流水线为准。
+Android Studio 工程在 `android/`，默认声明 AGP 9.1.1、Gradle 9.3.1、Java 17、SDK 37；仓库不附 Gradle Wrapper。Android 16 独立包使用 `tools/build_android16.py`，不会改动源清单或 Android 17 包。普通发布以已验证的 Windows 流水线为准。
 
 ## 离线检查
 
 ```text
 node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs
 python tools/verify_android_catalog.py
+python tools/verify_android16.py
 python tools/verify_open_source.py
 ```
 
-Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆盖恒星时、地平坐标、正逆投影、星等筛选及独立日/月食日期的月相。星表检查逐字节比较 Android 与预览数据库。开源检查仅扫描发布文件清单，不读取私钥目录。
+Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆盖恒星时、地平坐标、正逆投影、星等筛选及独立日/月食日期的月相。星表检查逐字节比较 Android 与预览数据库。`verify_android16.py` 须在两个 APK 均构建后运行，检查 API 36、应用名、摘要与签名一致性。开源检查仅扫描发布文件清单，不读取私钥目录。
 
 ## Android 设备测试
 
@@ -39,6 +44,8 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 ```
 
 `AnnotationInstrumentation` 验证亮星名称与星座开关在精简版可用、自动切换标准版，以及星名、星座和闪烁强度带来实际 GLES 像素变化。`CelestialInstrumentation` 验证数据库、预览参数、GLES 帧、月球和星云像素、亮星面积、指针模式、地平线下月球隐藏。其他夹具记录初期版本的设置或系统集成场景；`BrightnessInstrumentation` 和 `UpgradeSeedInstrumentation` 是早期升级夹具，预设不适用于当前版本。`SmokeInstrumentation` 的旧大星表断言也不作为本版回归入口。
+
+Android 16 安装包可使用 `python tools/bootstrap_emulator16.py` 准备官方 API 36 模拟器；系统镜像约 844 MB，测试环境须另有足够空间。安装 `dist/starwallpaper-1.2.3-android16.apk` 和 `build/android16/qa/starfield-qa.apk` 后，运行同一组 `AnnotationInstrumentation` 与 `CelestialInstrumentation`；本版两组均已在 API 36 模拟器通过。Android 17 模拟器准备脚本仍为 `tools/bootstrap_emulator.py`。
 
 ## 预览
 
