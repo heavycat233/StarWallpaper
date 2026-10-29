@@ -1,16 +1,17 @@
 # GitHub 发布说明
 
-建议仓库名 `Starfield`，公开可见；描述为“Offline real-sky live wallpaper for Android 17+, with HYG stars, nebulae and lunar phases”。
+公开仓库：[`heavycat233/StarWallpaper`](https://github.com/heavycat233/StarWallpaper)。建议描述为“Offline real-sky live wallpaper for Android 17+, with HYG stars, nebulae and lunar phases”。
 
 首次上传前运行 `python tools/verify_open_source.py` 并检查 `git diff --cached --stat`。只提交发布清单内的文件；私钥、构建缓存和历史大数据保留在本机忽略目录。
 
 本地已建立仓库时，可在自己的 GitHub 账号创建不带 README/许可证的空仓库，然后使用 Git 推送 `main`。如果仓库预先存在内容，先读取远端，避免强制覆盖。也可以使用已登录的 GitHub CLI：
 
 ```text
-gh repo create Starfield --public --source . --remote origin --push
+git remote add origin https://github.com/heavycat233/StarWallpaper.git
+git push -u origin main
 ```
 
-只在尚无同名仓库、origin 未配置且确认目标是自己的账号时使用。不要把访问令牌写进文件或远端 URL。
+只在 origin 未配置且确认目标是自己的账号时使用。不要把访问令牌写进文件或远端 URL。
 
 ## Releases
 
