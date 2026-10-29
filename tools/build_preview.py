@@ -16,6 +16,7 @@ data = base64.b64encode(gzip.compress(planes,9,mtime=0)).decode('ascii')
 catalogue = {'count': meta['count'], 'named': meta['named'], 'layout': 'byte-planes', 'data': data}
 fragment = fragment.replace('<!-- SKY_MATH -->', '<script>\n' + (ROOT / 'preview/sky-math.js').read_text(encoding='utf-8') + '\n</script>')
 fragment = fragment.replace('<!-- CATALOGUE -->', '<script>window.STAR_CATALOGUE=' + json.dumps(catalogue, ensure_ascii=False, separators=(',', ':')) + ';</script>')
+fragment = fragment.replace('<!-- CONSTELLATIONS -->', '<script>window.STAR_CONSTELLATIONS=' + (ROOT/'data/constellations.json').read_text(encoding='utf-8') + ';</script>')
 fragment = fragment.replace('<!-- ASTRONOMY -->', '<script>\n' + (ROOT/'vendor/astronomy/astronomy.browser.min.js').read_text(encoding='utf-8') + '\n</script>')
 fragment = fragment.replace('<!-- CELESTIAL_DATA -->','<script>window.STAR_CELESTIAL_DATA='+(ROOT/'data/celestials.json').read_text(encoding='utf-8')+';</script>')
 fragment = fragment.replace('<!-- CELESTIAL_MATH -->','<script>\n'+(ROOT/'preview/celestial-math.js').read_text(encoding='utf-8')+'\n</script>')

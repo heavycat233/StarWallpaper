@@ -11,7 +11,7 @@
     atacama: { name: '阿塔卡马', lat: -23.023, lon: -67.755, zone: 'America/Santiago' },
     reykjavik: { name: '雷克雅未克', lat: 64.1466, lon: -21.9426, zone: 'Atlantic/Reykjavik' }
   };
-  const state = { clock: 'digital', uiMode: 'minimal', magnitude: 8, faintBrightness: 180, brightSize: 75, nebulae: true, nebulaBrightness: 140, nebulaSize: 250, moon: true, moonSize: 8, example: false, celestialSceneVersion: 1, fov: 147, glow: 148, dust: 50, twinkle: !matchMedia('(prefers-reduced-motion: reduce)').matches, labels: false, city: 'lhasa', ...cities.lhasa, azimuth: 270, altitude: 90, live: true, epoch: Date.now() };
+  const state = { clock: 'digital', uiMode: 'minimal', magnitude: 8, faintBrightness: 180, brightSize: 75, nebulae: true, nebulaBrightness: 140, nebulaSize: 250, moon: true, moonSize: 8, example: false, celestialSceneVersion: 1, fov: 147, glow: 148, dust: 50, twinkle: !matchMedia('(prefers-reduced-motion: reduce)').matches, twinkleStrength: 140, labels: false, constellations: false, city: 'lhasa', ...cities.lhasa, azimuth: 270, altitude: 90, live: true, epoch: Date.now() };
   const design = { clockScale: 100, clockTop: 13, ink: '#f2eddf' };
   let records = [], visible = [], namedVisible = [], camera, busy = false, frame = 0, lastFrame = -Infinity, lastGeometry = 0, timer, width = 320, height = 680, dpr = 1, destroyed = false;
   const baseCanvas = $('.sw-sky'), dynamicCanvas = $('.sw-stars');
@@ -49,22 +49,22 @@
   function error(message = '') { $('.sw-error').hidden = !message; $('.sw-error').textContent = message; }
   function remember() {
     const data = { ...state, epoch: state.live ? null : state.epoch };
-    const snapshot = { modelContent: { clock: state.clock, uiMode: state.uiMode, magnitude: state.magnitude, faintBrightness: state.faintBrightness, brightSize: state.brightSize, nebulae: state.nebulae, nebulaBrightness: state.nebulaBrightness, nebulaSize: state.nebulaSize, moon: state.moon, moonSize: state.moonSize, example: state.example, celestialSceneVersion: 1, fov: state.fov, city: state.city, location: state.name, latitude: state.lat, longitude: state.lon, timezone: state.zone, live: state.live, date: state.live ? '实时' : new Date(state.epoch).toISOString(), glow: state.glow, dust: state.dust, twinkle: state.twinkle, labels: state.labels, azimuth: state.azimuth, altitude: state.altitude, viewingDirection: state.altitude === 90 ? '天顶' : directions(state.azimuth) }, privateContent: { settings: data, design: { ...design }, returnView } };
+    const snapshot = { modelContent: { clock: state.clock, uiMode: state.uiMode, magnitude: state.magnitude, faintBrightness: state.faintBrightness, brightSize: state.brightSize, nebulae: state.nebulae, nebulaBrightness: state.nebulaBrightness, nebulaSize: state.nebulaSize, moon: state.moon, moonSize: state.moonSize, example: state.example, celestialSceneVersion: 1, fov: state.fov, city: state.city, location: state.name, latitude: state.lat, longitude: state.lon, timezone: state.zone, live: state.live, date: state.live ? '实时' : new Date(state.epoch).toISOString(), glow: state.glow, dust: state.dust, twinkle: state.twinkle, twinkleStrength: state.twinkleStrength, labels: state.labels, constellations: state.constellations, azimuth: state.azimuth, altitude: state.altitude, viewingDirection: state.altitude === 90 ? '天顶' : directions(state.azimuth) }, privateContent: { settings: data, design: { ...design }, returnView } };
     if (window.openai?.setWidgetState) window.openai.setWidgetState(snapshot).catch(() => {});
   }
   function restore(snapshot) {
     const publicState = snapshot?.modelContent || (snapshot && !snapshot.privateContent ? snapshot : null);
     const input = snapshot?.privateContent?.settings || (publicState && { ...publicState, name: publicState.location ?? publicState.name, lat: publicState.latitude ?? publicState.lat, lon: publicState.longitude ?? publicState.lon, zone: publicState.timezone ?? publicState.zone, epoch: publicState.epoch ?? Date.parse(publicState.date) });
     if (!input || typeof input !== 'object') return;
-    for (const key of ['magnitude', 'faintBrightness', 'brightSize', 'nebulaBrightness', 'nebulaSize', 'moonSize', 'fov', 'glow', 'dust', 'lat', 'lon', 'azimuth', 'altitude']) {
-      const bounds = { magnitude: [3, 11], faintBrightness: [50, 400], brightSize: [50, 100], nebulaBrightness: [0, 250], nebulaSize: [100, 400], moonSize: [1, 12], fov: [120, 180], glow: [0, 200], dust: [0, 150], lat: [-90, 90], lon: [-180, 180], azimuth: [0, 359], altitude: [0, 90] }[key];
+    for (const key of ['magnitude', 'faintBrightness', 'brightSize', 'nebulaBrightness', 'nebulaSize', 'moonSize', 'fov', 'glow', 'dust', 'twinkleStrength', 'lat', 'lon', 'azimuth', 'altitude']) {
+      const bounds = { magnitude: [3, 11], faintBrightness: [50, 400], brightSize: [50, 100], nebulaBrightness: [0, 250], nebulaSize: [100, 400], moonSize: [1, 12], fov: [120, 180], glow: [0, 200], dust: [0, 150], twinkleStrength: [0, 200], lat: [-90, 90], lon: [-180, 180], azimuth: [0, 359], altitude: [0, 90] }[key];
       if (Number.isFinite(input[key])) state[key] = M.clamp(input[key], ...bounds);
     }
     if (input.clock === 'analog' || input.clock === 'digital') state.clock = input.clock;
     if (input.uiMode === 'standard' || input.uiMode === 'minimal') state.uiMode = input.uiMode;
     if (cities[input.city] || input.city === 'custom') state.city = input.city;
     if (typeof input.name === 'string') state.name = input.name.slice(0, 30);
-    for (const key of ['twinkle', 'labels', 'live', 'nebulae', 'moon', 'example']) if (typeof input[key] === 'boolean') state[key] = input[key];
+    for (const key of ['twinkle', 'labels', 'constellations', 'live', 'nebulae', 'moon', 'example']) if (typeof input[key] === 'boolean') state[key] = input[key];
     if (Array.from($('#sw-zone').options).some(o => o.value === input.zone)) state.zone = input.zone;
     state.epoch = !state.live && Number.isFinite(input.epoch) && input.epoch >= Date.UTC(1900, 0, 1) && input.epoch <= Date.UTC(2101, 0, 1) ? input.epoch : Date.now();
     const d = snapshot.privateContent?.design;
@@ -84,13 +84,14 @@
     const minimal = state.uiMode === 'minimal';
     root.dataset.uiMode = state.uiMode;
     root.querySelectorAll('[data-ui-mode]').forEach(button => button.setAttribute('aria-pressed', button.dataset.uiMode === state.uiMode));
-    for (const [id, key] of [['sw-magnitude', 'magnitude'], ['sw-faint-brightness', 'faintBrightness'], ['sw-bright-size','brightSize'], ['sw-nebula-brightness','nebulaBrightness'], ['sw-nebula-size','nebulaSize'], ['sw-moon-size','moonSize'], ['sw-fov', 'fov'], ['sw-glow', 'glow'], ['sw-dust', 'dust'], ['sw-azimuth', 'azimuth'], ['sw-altitude', 'altitude'], ['sw-lat', 'lat'], ['sw-lon', 'lon'], ['sw-city', 'city'], ['sw-zone', 'zone']]) $('#' + id).value = state[key];
+    for (const [id, key] of [['sw-magnitude', 'magnitude'], ['sw-faint-brightness', 'faintBrightness'], ['sw-bright-size','brightSize'], ['sw-nebula-brightness','nebulaBrightness'], ['sw-nebula-size','nebulaSize'], ['sw-moon-size','moonSize'], ['sw-fov', 'fov'], ['sw-glow', 'glow'], ['sw-dust', 'dust'], ['sw-twinkle-strength', 'twinkleStrength'], ['sw-azimuth', 'azimuth'], ['sw-altitude', 'altitude'], ['sw-lat', 'lat'], ['sw-lon', 'lon'], ['sw-city', 'city'], ['sw-zone', 'zone']]) $('#' + id).value = state[key];
     $('#sw-nebulae').checked=state.nebulae; $('#sw-moon').checked=state.moon;
     $('#sw-bright-value').textContent=state.brightSize+'%';
     $('#sw-nebula-bright-value').textContent=state.nebulaBrightness+'%';
     $('#sw-nebula-size-value').textContent=(state.nebulaSize/100).toFixed(1)+'×';
     $('#sw-moon-value').textContent=state.moonSize+'×';
-    $('#sw-twinkle').checked = state.twinkle; $('#sw-labels').checked = state.labels && !minimal; $('#sw-labels').disabled = minimal;
+    $('#sw-twinkle').checked = state.twinkle; $('#sw-labels').checked = state.labels && !minimal; $('#sw-constellations').checked = state.constellations && !minimal;
+    $('#sw-twinkle-value').textContent=state.twinkleStrength+'%';
     $('#sw-mag-value').textContent = `${state.magnitude} 等`;
     $('#sw-faint-value').textContent = `${state.faintBrightness}%`;
     $('#sw-fov-value').textContent = `${state.fov}°`;
@@ -294,6 +295,30 @@
       const arm=5*state.brightSize/100;context.beginPath(); context.moveTo(s[0] - arm, s[1]); context.lineTo(s[0] + arm, s[1]); context.moveTo(s[0], s[1] - arm); context.lineTo(s[0], s[1] + arm); context.stroke();
     }
   }
+  function paintConstellations() {
+    ctx.strokeStyle='rgba(151,169,200,.52)';ctx.lineWidth=.75;
+    for(const figure of window.STAR_CONSTELLATIONS.figures){
+      for(const path of figure[4]){
+        let previous=null;
+        for(const [lon,dec] of path){
+          const point=M.project(M.equatorial(lon/15,dec),camera);
+          if(previous&&point){ctx.beginPath();ctx.moveTo(previous[0],previous[1]);ctx.lineTo(point[0],point[1]);ctx.stroke();}
+          previous=point;
+        }
+      }
+    }
+    ctx.textAlign='center';ctx.font='10px "Segoe UI", "Microsoft YaHei", sans-serif';ctx.fillStyle='rgba(224,217,199,.78)';
+    const occupied=[],named=new Set();
+    for(const figure of window.STAR_CONSTELLATIONS.figures){
+      if(named.has(figure[0]))continue;
+      named.add(figure[0]);
+      const point=M.project(M.equatorial(figure[2]/15,figure[3]),camera);
+      if(!point||point[0]<25||point[0]>width-25||point[1]<25||point[1]>height-25)continue;
+      if(occupied.some(other=>Math.hypot(point[0]-other[0],point[1]-other[1])<52))continue;
+      ctx.fillText(figure[1],point[0],point[1]);occupied.push(point);
+    }
+    ctx.textAlign='start';
+  }
   function rebuild() {
     if (busy || !records.length || destroyed) return;
     busy = true;
@@ -314,17 +339,19 @@
         if (star.mag < 6.5) visible.push(s); else paintStar(sctx, s);
       }
       for (const n of window.STAR_CATALOGUE.named) {
-        if (n[3] > state.magnitude || !chineseNames[n[0]]) continue;
+        if (n[3] > state.magnitude) continue;
         const p = M.project(M.equatorial(n[1], n[2]), camera);
-        if (p && p[0] > 20 && p[0] < width - 55 && p[1] > height * .49 && p[1] < height - 140) namedVisible.push([p[0], p[1], chineseNames[n[0]]]);
+        if (p && p[0] > 5 && p[0] < width - 5 && p[1] > 12 && p[1] < height - 12) namedVisible.push([p[0], p[1], chineseNames[n[0]] || n[0]]);
       }
       ctx.drawImage(staticStars, 0, 0, width, height);
+      if (state.constellations && state.uiMode !== 'minimal') paintConstellations();
       if (state.labels && state.uiMode !== 'minimal') {
-        ctx.font = '9px "Segoe UI", "Microsoft YaHei", sans-serif'; ctx.fillStyle = '#d6d4cbb3';
+        ctx.font = '9px "Segoe UI", "Microsoft YaHei", sans-serif'; ctx.fillStyle = 'rgba(229,223,208,.88)';
         const occupied = [];
         for (const n of namedVisible) {
-          if (occupied.some(p => Math.hypot(p[0] - n[0], p[1] - n[1]) < 45)) continue;
-          ctx.fillText(n[2], n[0] + 6, n[1] - 6); occupied.push(n);
+          if (occupied.some(p => Math.hypot(p[0] - n[0], p[1] - n[1]) < 42)) continue;
+          const x=n[0]+7+ctx.measureText(n[2]).width>width-5?n[0]-7-ctx.measureText(n[2]).width:n[0]+7;
+          ctx.fillText(n[2], x, n[1] - 5); occupied.push(n);
         }
       }
       paintMoon();
@@ -338,7 +365,7 @@
     dyn.setTransform(dpr, 0, 0, dpr, 0, 0); dyn.clearRect(0, 0, width, height);
     for (const s of visible) {
       if(moonDisk&&Math.hypot(s[0]-moonDisk.x,s[1]-moonDisk.y)<moonDisk.radius+1)continue;
-      const strength = .08 + .14 * (1 - s[2]);
+      const strength = Math.min(.48,(.15 + .20 * (1 - s[2])) * state.twinkleStrength/100);
       const wave = state.twinkle ? 1 - strength + strength * Math.sin(t * .0013 + s[5]) * Math.sin(t * .0007 + s[5] * 1.7) : 1;
       paintStar(dyn, s, wave);
     }
@@ -381,11 +408,12 @@
     changed();
   }));
   $('.sw-zenith').addEventListener('click', () => { state.altitude = 90; changed(); });
-  for (const [id, key] of [['sw-magnitude', 'magnitude'], ['sw-faint-brightness', 'faintBrightness'], ['sw-bright-size','brightSize'], ['sw-nebula-brightness','nebulaBrightness'], ['sw-nebula-size','nebulaSize'], ['sw-moon-size','moonSize'], ['sw-fov', 'fov'], ['sw-glow', 'glow'], ['sw-dust', 'dust'], ['sw-azimuth', 'azimuth'], ['sw-altitude', 'altitude']]) {
+  for (const [id, key] of [['sw-magnitude', 'magnitude'], ['sw-faint-brightness', 'faintBrightness'], ['sw-bright-size','brightSize'], ['sw-nebula-brightness','nebulaBrightness'], ['sw-nebula-size','nebulaSize'], ['sw-moon-size','moonSize'], ['sw-fov', 'fov'], ['sw-glow', 'glow'], ['sw-dust', 'dust'], ['sw-twinkle-strength', 'twinkleStrength'], ['sw-azimuth', 'azimuth'], ['sw-altitude', 'altitude']]) {
     $('#' + id).addEventListener('input', event => { state[key] = Number(event.target.value); changed(); });
   }
   $('#sw-twinkle').addEventListener('change', e => { state.twinkle = e.target.checked; changed(false); });
-  $('#sw-labels').addEventListener('change', e => { state.labels = e.target.checked; changed(); });
+  $('#sw-labels').addEventListener('change', e => { state.labels = e.target.checked; if(state.labels)state.uiMode='standard'; changed(); });
+  $('#sw-constellations').addEventListener('change', e => { state.constellations = e.target.checked; if(state.constellations)state.uiMode='standard'; changed(); });
   $('#sw-nebulae').addEventListener('change',e=>{state.nebulae=e.target.checked;changed();});
   $('#sw-moon').addEventListener('change',e=>{state.moon=e.target.checked;changed();});
   $('.sw-night-example').addEventListener('click',()=>{if(nightExample())changed();});

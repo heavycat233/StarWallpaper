@@ -1,6 +1,6 @@
 # Android 原生工程
 
-当前版本 **1.2.1**；Java 17 / OpenGL ES 3.0 / Android API 37。Android Studio 打开本目录；仓库没有 Gradle Wrapper。已验证的 Windows 命令行构建从仓库根目录运行：
+当前版本 **1.2.2**；Java 17 / OpenGL ES 3.0 / Android API 37。Android Studio 打开本目录；仓库没有 Gradle Wrapper。已验证的 Windows 命令行构建从仓库根目录运行：
 
 ```text
 python tools/bootstrap_android.py

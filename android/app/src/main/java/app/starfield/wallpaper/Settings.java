@@ -20,20 +20,20 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public Snapshot snapshot(){return new Snapshot(prefs);}
     public static final class Snapshot {
         public final String clock,uiMode,place,zone;
-        public final int magnitude,faintBrightness,fov,glow,dust,azimuth,altitude,clockTop,fps,brightSize,nebulaBrightness,nebulaSize,moonSize;
+        public final int magnitude,faintBrightness,fov,glow,dust,azimuth,altitude,clockTop,fps,brightSize,nebulaBrightness,nebulaSize,moonSize,twinkleStrength;
         public final boolean nebulae,moon;
         public final double lat,lon;
-        public final boolean twinkle,labels,followLocation,systemTime,desktopClock;
+        public final boolean twinkle,labels,constellations,followLocation,systemTime,desktopClock;
         public final long fixedEpoch;
         Snapshot(SharedPreferences p){
             clock=p.getString("clock","digital");uiMode=p.getString("uiMode","minimal");place=p.getString("place","香港");
             String savedZone=p.getString("zone","Asia/Hong_Kong");try{ZoneId.of(savedZone);}catch(Exception e){savedZone="Asia/Shanghai";}zone=savedZone;
             magnitude=bounded(p,"magnitude",9,3,11);faintBrightness=bounded(p,"faintBrightness",120,50,400);fov=bounded(p,"fov",180,120,180);glow=bounded(p,"glow",148,0,200);dust=bounded(p,"dust",50,0,150);
             brightSize=bounded(p,"brightSize",70,50,100);nebulaBrightness=bounded(p,"nebulaBrightness",140,0,250);nebulaSize=bounded(p,"nebulaSize",250,100,400);moonSize=bounded(p,"moonSize",8,1,12);nebulae=p.getBoolean("nebulae",true);moon=p.getBoolean("moon",true);
-            azimuth=bounded(p,"azimuth",94,0,359);altitude=bounded(p,"altitude",79,0,90);clockTop=bounded(p,"clockTop",13,5,65);fps=bounded(p,"fps",20,5,30);
+            azimuth=bounded(p,"azimuth",94,0,359);altitude=bounded(p,"altitude",79,0,90);clockTop=bounded(p,"clockTop",13,5,65);fps=bounded(p,"fps",20,5,30);twinkleStrength=bounded(p,"twinkleStrength",140,0,200);
             double la=Double.longBitsToDouble(p.getLong("lat",Double.doubleToLongBits(22.3193))),lo=Double.longBitsToDouble(p.getLong("lon",Double.doubleToLongBits(114.1694)));
             lat=Double.isFinite(la)?SkyMath.clamp(la,-90,90):22.3193;lon=Double.isFinite(lo)?SkyMath.clamp(lo,-180,180):114.1694;
-            twinkle=p.getBoolean("twinkle",true);labels=p.getBoolean("labels",false)&&!uiMode.equals("minimal");followLocation=p.getBoolean("followLocation",false);
+            twinkle=p.getBoolean("twinkle",true);labels=p.getBoolean("labels",false)&&!uiMode.equals("minimal");constellations=p.getBoolean("constellations",false)&&!uiMode.equals("minimal");followLocation=p.getBoolean("followLocation",false);
             systemTime=p.getBoolean("systemTime",true);fixedEpoch=p.getLong("fixedEpoch",System.currentTimeMillis());desktopClock=p.getBoolean("desktopClock",false);
         }
         static int bounded(SharedPreferences p,String key,int value,int lo,int hi){return (int)SkyMath.clamp(p.getInt(key,value),lo,hi);}

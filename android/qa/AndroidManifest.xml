@@ -7,4 +7,5 @@
     <instrumentation android:name="app.starfield.wallpaper.test.UpgradeSeedInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield upgrade fixture" />
     <instrumentation android:name="app.starfield.wallpaper.test.BrightnessInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Starfield dark-star pixels QA" />
     <instrumentation android:name="app.starfield.wallpaper.test.CelestialInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Celestial pixel QA" />
+    <instrumentation android:name="app.starfield.wallpaper.test.AnnotationInstrumentation" android:targetPackage="app.starfield.wallpaper" android:label="Star names, constellations and twinkle QA" />
 </manifest>

@@ -41,7 +41,9 @@
       </div>
       <div class="sw-control"><label for="sw-glow">银河光晕 <output id="sw-glow-value">135%</output></label><input id="sw-glow" aria-label="银河光晕" type="range" min="0" max="200" value="135"></div>
       <div class="sw-control"><label for="sw-dust">暗云层次 <output id="sw-dust-value">75%</output></label><input id="sw-dust" aria-label="暗云层次" type="range" min="0" max="150" value="75"></div>
-      <div class="sw-switches"><label><span><i data-lucide="sparkles" aria-hidden="true"></i> 星点闪烁</span><input id="sw-twinkle" type="checkbox" role="switch" checked></label><label><span><i data-lucide="orbit" aria-hidden="true"></i> 亮星名称</span><input id="sw-labels" type="checkbox" role="switch"></label></div>
+      <div class="sw-switches"><label><span><i data-lucide="sparkles" aria-hidden="true"></i> 星点闪烁</span><input id="sw-twinkle" type="checkbox" role="switch" checked></label><label><span><i data-lucide="orbit" aria-hidden="true"></i> 亮星名称</span><input id="sw-labels" type="checkbox" role="switch"></label><label><span><i data-lucide="stars" aria-hidden="true"></i> 星座连线与名称</span><input id="sw-constellations" type="checkbox" role="switch"></label></div>
+      <div class="sw-control"><label for="sw-twinkle-strength">闪烁强度 <output id="sw-twinkle-value">140%</output></label><input id="sw-twinkle-strength" aria-label="闪烁强度" type="range" min="0" max="200" step="10" value="140"><div class="sw-range-labels"><span>0% · 不闪烁</span><span>200% · 明显</span></div></div>
+      <p class="sw-annotation-note">开启星名或星座时自动切换标准版。</p>
       <details class="sw-celestial-settings" open><summary class="cursor-interaction">星云与月球</summary>
         <div class="sw-switches"><label><span>真实位置星云</span><input id="sw-nebulae" type="checkbox" role="switch" checked></label><label><span>月球与月相</span><input id="sw-moon" type="checkbox" role="switch" checked></label></div>
         <div class="sw-control"><label for="sw-nebula-brightness">星云亮度 <output id="sw-nebula-bright-value">140%</output></label><input id="sw-nebula-brightness" aria-label="星云亮度" type="range" min="0" max="250" step="10" value="140"></div>
@@ -67,7 +69,7 @@
 #starwall-preview *{box-sizing:border-box}
 #starwall-preview [hidden]{display:none!important}
 #starwall-preview[data-ui-mode=minimal] .sw-status,#starwall-preview[data-ui-mode=minimal] .sw-clock-caption,#starwall-preview[data-ui-mode=minimal] .sw-horizon-label,#starwall-preview[data-ui-mode=minimal] .sw-bottom,#starwall-preview[data-ui-mode=minimal] .sw-gesture,#starwall-preview[data-ui-mode=minimal] .sw-caption{display:none!important}
-#starwall-preview #sw-labels:disabled{opacity:.4}
+#starwall-preview .sw-annotation-note{font-size:10px;color:var(--sw-muted);margin:-12px 0 18px}
 #starwall-preview button,#starwall-preview input,#starwall-preview select{font:inherit}
 #starwall-preview .sw-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
 #starwall-preview .sw-brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:500;letter-spacing:3px}
@@ -163,6 +165,7 @@
 <!-- SKY_MATH -->
 <!-- ASTRONOMY -->
 <!-- CATALOGUE -->
+<!-- CONSTELLATIONS -->
 <!-- CELESTIAL_DATA -->
 <!-- CELESTIAL_MATH -->
 <!-- PREVIEW_SCRIPT -->

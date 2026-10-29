@@ -6,7 +6,7 @@ layout(location=2) in float aColorIndex;
 uniform mat3 uLocal;
 uniform vec3 uRight,uUp,uCenter;
 uniform vec2 uSize;
-uniform float uScale,uTime,uPixelScale,uFaintBrightness,uBrightSize;
+uniform float uScale,uTime,uPixelScale,uFaintBrightness,uBrightSize,uTwinkleStrength;
 uniform int uTwinkle;
 out vec3 vColor;
 out float vAlpha;
@@ -21,7 +21,7 @@ void main(){
     vRadius=size;vHalo=aMagnitude<3.?size*4.3*(.8+.2*uBrightSize):0.;vArm=aMagnitude<.7?5.*uBrightSize*uPixelScale:0.;vLine=.55*uPixelScale;vExtent=max(size,max(vHalo,vArm))+1.;gl_PointSize=2.*vExtent;
     if(aColorIndex<0.)vColor=vec3(174,198,255)/255.;else if(aColorIndex<.4)vColor=vec3(204,218,255)/255.;else if(aColorIndex<.85)vColor=vec3(239,236,225)/255.;else if(aColorIndex<1.4)vColor=vec3(250,221,184)/255.;else vColor=vec3(255,190,151)/255.;
     float phase=float(gl_VertexID)*2.39996323;
-    float strength=.08+.14*(1.-v.z),wave=uTwinkle==1&&aMagnitude<6.5?1.-strength+strength*sin(uTime*1.3+phase)*sin(uTime*.7+phase*1.7):1.;
+    float strength=min(.48,(.15+.20*(1.-v.z))*uTwinkleStrength),wave=uTwinkle==1&&aMagnitude<6.5?1.-strength+strength*sin(uTime*1.3+phase)*sin(uTime*.7+phase*1.7):1.;
     vWave=wave;
     float faintGain=mix(1.,uFaintBrightness,smoothstep(5.,8.,aMagnitude));
     vAlpha=clamp(1.6*pow(10.,-.115*max(-1.,aMagnitude)),.08,1.)*wave*faintGain;

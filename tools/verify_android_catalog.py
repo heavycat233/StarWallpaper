@@ -26,6 +26,16 @@ assert counts==meta['counts']
 assert records==gzip.decompress(base64.b64decode((ROOT/'data/catalogue.b64').read_text(encoding='ascii')))
 assert meta['count']==115570 and meta['source']=='HYG v4.1'
 print('PASS every native record equals the preview, including order and quantization.')
+figures_bytes=(ROOT/'data/constellations.json').read_bytes()
+assert figures_bytes==(ASSETS/'constellations.json').read_bytes()
+figures=json.loads(figures_bytes)['figures']
+assert len(figures)==89 and len({item[0] for item in figures})==88
+for code,name,lon,dec,paths in figures:
+    assert code and name and -180<=lon<=180 and -90<=dec<=90
+    assert paths and all(len(path)>=2 for path in paths)
+    for path in paths:
+        for ra,latitude in path:assert -180<=ra<=180 and -90<=latitude<=90
+print('PASS Android and preview use the same 88 constellation figures, names and J2000 lines.')
 root=ET.parse(ROOT/'android/app/src/main/AndroidManifest.xml').getroot()
 attr='{http://schemas.android.com/apk/res/android}'
 assert root.find('uses-sdk').attrib[attr+'minSdkVersion']=='37'

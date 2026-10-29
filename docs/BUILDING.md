@@ -32,12 +32,13 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 先安装主 APK 和 QA APK。仅在可清理的测试设备/模拟器运行，夹具会更改并恢复测试偏好；不要在日常设备运行历史夹具。
 
 ```powershell
-.toolchains/sdk/platform-tools/adb.exe install -r dist/Starfield-1.2.1-android17.apk
+.toolchains/sdk/platform-tools/adb.exe install -r dist/Starfield-1.2.2-android17.apk
 .toolchains/sdk/platform-tools/adb.exe install -r build/android/qa/starfield-qa.apk
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.CelestialInstrumentation
+.toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.AnnotationInstrumentation
 ```
 
-当前回归入口是 `CelestialInstrumentation`，验证版本/数据库、载入对话预览参数、GLES 帧、月球和星云像素、亮星面积、指针模式、地平线下月球隐藏。其他夹具记录初期版本的设置或系统集成场景；`BrightnessInstrumentation` 和 `UpgradeSeedInstrumentation` 是早期升级夹具，预设不适用于当前版本。`SmokeInstrumentation` 的旧大星表断言也不作为本版回归入口。
+`AnnotationInstrumentation` 验证亮星名称与星座开关在精简版可用、自动切换标准版，以及星名、星座和闪烁强度带来实际 GLES 像素变化。`CelestialInstrumentation` 验证数据库、预览参数、GLES 帧、月球和星云像素、亮星面积、指针模式、地平线下月球隐藏。其他夹具记录初期版本的设置或系统集成场景；`BrightnessInstrumentation` 和 `UpgradeSeedInstrumentation` 是早期升级夹具，预设不适用于当前版本。`SmokeInstrumentation` 的旧大星表断言也不作为本版回归入口。
 
 ## 预览
 
@@ -58,6 +59,7 @@ python tools/serve_preview.py
 | 从原始 HYG CSV 重新量化 | `python tools/prepare_catalog.py`；需从 NOTICE 的 HYG 来源另取 v4.1 CSV，放在 `data/hygdata_v41.csv`。原始大 CSV 不纳入仓库。 |
 | 重建星云与月面派生数据 | `python tools/prepare_celestials.py`，再 `python tools/prepare_android_celestials.py`；需要 Pillow，输入为已附 OpenNGC CSV 与 NASA 月面图。 |
 | 重建 1900–2101 月球星历 | `node tools/prepare_moon.cjs`；使用已附 Astronomy Engine 2.1.19，无 npm 安装。 |
+| 重建星座连线与名称 | `python tools/build_constellations.py`；输入为已附的 d3-celestial 原始 GeoJSON，输出 Android 与预览共享的 J2000 坐标。 |
 
 修改目录时继续保留 CC BY-SA 许可、来源、修改说明，并更新两端资产和一致性测试。`tools/download_deep_catalog.py` 是旧 AT-HYG 实验脚本，当前构建不运行它。
 
@@ -68,4 +70,4 @@ python tools/verify_open_source.py
 python tools/package_open_source.py
 ```
 
-只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/Starfield-open-source-1.2.1.zip` 可以直接解压后构建。
+只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/Starfield-open-source-1.2.2.zip` 可以直接解压后构建。

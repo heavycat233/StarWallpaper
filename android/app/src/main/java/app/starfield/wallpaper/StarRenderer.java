@@ -36,6 +36,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     private int seenVersion=-1,width=1,height=1,quadVao,starVao,quadVbo,starVbo,galaxyProgram,starsProgram,textureProgram,galaxyTexture,overlayTexture,framebuffer;
     private int galaxyW,galaxyH;
     private StarCatalog catalog;
+    private ConstellationOverlay constellations;
     private CelestialLayer celestial;private int cloudTexture;private Bitmap cloudOverlay;
     private long galaxyTime=Long.MIN_VALUE,overlayTime=Long.MIN_VALUE;
     private int galaxyVersion=-1,overlayVersion=-1;
@@ -50,7 +51,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     @Override public void onSurfaceCreated(GL10 ignored,EGLConfig config){
         error=null;uniformCache.clear();galaxyTime=Long.MIN_VALUE;overlayTime=Long.MIN_VALUE;seenVersion=-1;
         try{
-            catalog=StarCatalog.get(context);celestial=new CelestialLayer(context);
+            catalog=StarCatalog.get(context);celestial=new CelestialLayer(context);constellations=new ConstellationOverlay(context);
             int[] vaos=new int[2],buffers=new int[2],textures=new int[3],fbos=new int[1];
             GLES30.glGenVertexArrays(2,vaos,0);quadVao=vaos[0];starVao=vaos[1];GLES30.glGenBuffers(2,buffers,0);quadVbo=buffers[0];starVbo=buffers[1];
             FloatBuffer quad=ByteBuffer.allocateDirect(8*4).order(ByteOrder.nativeOrder()).asFloatBuffer();quad.put(new float[]{-1,-1,1,-1,-1,1,1,1}).position(0);
@@ -86,7 +87,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
             Canvas clouds=new Canvas(cloudOverlay);clouds.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);celestial.drawClouds(clouds,SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,cloudOverlay.getWidth(),cloudOverlay.getHeight()),scene);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,cloudTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,cloudOverlay,0);
         }
         GLES30.glDisable(GLES30.GL_BLEND);texture(galaxyTexture,false);GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(cloudTexture,true);
-        GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);GLES30.glUseProgram(starsProgram);cameraUniforms(starsProgram,camera);GLES30.glUniformMatrix3fv(uniform(starsProgram,"uLocal"),1,false,SkyMath.glMatrix(camera.local),0);GLES30.glUniform1f(uniform(starsProgram,"uTime"),(SystemClock.elapsedRealtime()%600000)/1000f);GLES30.glUniform1f(uniform(starsProgram,"uPixelScale"),Math.max(.85f,width/320f));GLES30.glUniform1f(uniform(starsProgram,"uFaintBrightness"),scene.faintBrightness/100f);GLES30.glUniform1f(uniform(starsProgram,"uBrightSize"),scene.brightSize/100f);GLES30.glUniform1i(uniform(starsProgram,"uTwinkle"),scene.twinkle?1:0);GLES30.glBindVertexArray(starVao);int total=catalog.counts[scene.magnitude],bright=Math.min(total,catalog.dynamicCount);if(total>bright)GLES30.glDrawArrays(GLES30.GL_POINTS,bright,total-bright);GLES30.glDrawArrays(GLES30.GL_POINTS,0,bright);
+        GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);GLES30.glUseProgram(starsProgram);cameraUniforms(starsProgram,camera);GLES30.glUniformMatrix3fv(uniform(starsProgram,"uLocal"),1,false,SkyMath.glMatrix(camera.local),0);GLES30.glUniform1f(uniform(starsProgram,"uTime"),(SystemClock.elapsedRealtime()%600000)/1000f);GLES30.glUniform1f(uniform(starsProgram,"uPixelScale"),Math.max(.85f,width/320f));GLES30.glUniform1f(uniform(starsProgram,"uFaintBrightness"),scene.faintBrightness/100f);GLES30.glUniform1f(uniform(starsProgram,"uBrightSize"),scene.brightSize/100f);GLES30.glUniform1f(uniform(starsProgram,"uTwinkleStrength"),scene.twinkleStrength/100f);GLES30.glUniform1i(uniform(starsProgram,"uTwinkle"),scene.twinkle?1:0);GLES30.glBindVertexArray(starVao);int total=catalog.counts[scene.magnitude],bright=Math.min(total,catalog.dynamicCount);if(total>bright)GLES30.glDrawArrays(GLES30.GL_POINTS,bright,total-bright);GLES30.glDrawArrays(GLES30.GL_POINTS,0,bright);
         long overlayBucket=epoch/(scene.clock.equals("analog")?1000:60000);
         if(overlayTime!=overlayBucket||overlayVersion!=version||overlayClock!=allowClock){
             drawOverlay(epoch);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,overlayTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,overlay,0);overlayTime=overlayBucket;overlayVersion=version;overlayClock=allowClock;
@@ -105,6 +106,11 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     private void text(Canvas c,String text,float x,float y,float size,int color,Typeface typeface){paint.setStyle(Paint.Style.FILL);paint.setColor(color);paint.setTextSize(size);paint.setTypeface(typeface);paint.setTextAlign(Paint.Align.CENTER);c.drawText(text,x,y,paint);}
     private void drawOverlay(long epoch){
         Canvas c=new Canvas(overlay);c.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);float scale=overlay.getWidth()/320f;c.scale(scale,scale);float h=overlay.getHeight()/scale,top=h*scene.clockTop/100f;boolean minimal=scene.uiMode.equals("minimal");int ink=Color.rgb(242,237,223),muted=Color.rgb(169,174,190);Typeface regular=Typeface.create("sans-serif",Typeface.NORMAL),light=Typeface.create("sans-serif-light",Typeface.NORMAL);
+        if(scene.constellations||scene.labels){
+            SkyMath.Camera camera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,320,Math.round(h));
+            if(scene.constellations)constellations.draw(c,camera);
+            if(scene.labels)drawStarNames(c,camera,h,regular);
+        }
         celestial.drawMoon(c,SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,320,Math.round(h)),scene,epoch);
         paint.setShader(new android.graphics.LinearGradient(0,0,0,h,new int[]{0x88030613,0x10030613,0x00030613,0x08030613,0xb0030613},new float[]{0,.24f,.51f,.65f,1},android.graphics.Shader.TileMode.CLAMP));paint.setColor(Color.WHITE);paint.setStyle(Paint.Style.FILL);c.drawRect(0,0,320,h,paint);paint.setShader(null);
         ZonedDateTime local=Instant.ofEpochMilli(epoch).atZone(ZoneId.of(scene.zone));
@@ -120,10 +126,21 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
             text(c,String.format(Locale.ROOT,"%.2f° %s / %.2f° %s",Math.abs(scene.lat),scene.lat<0?"S":"N",Math.abs(scene.lon),scene.lon<0?"W":"E"),160,h-108,8,muted,regular);
             text(c,scene.place,160,h-59,14,ink,regular);text(c,scene.systemTime?"当地星空 · 实时":"当地星空 · 指定时间",160,h-40,9,muted,regular);
         }
-        if(scene.labels){
-            SkyMath.Camera camera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,320,Math.round(h));double lastX=-1000,lastY=-1000;
-            for(int i=0;i<catalog.named.length();i++)try{JSONArray n=catalog.named.getJSONArray(i);String name=NAMES.get(n.getString(0));if(name==null||n.getDouble(3)>scene.magnitude)continue;double[] p=camera.project(SkyMath.equatorial(n.getDouble(1),n.getDouble(2)));if(p!=null&&p[0]>20&&p[0]<270&&p[1]>h*.5&&p[1]<h-150&&Math.hypot(p[0]-lastX,p[1]-lastY)>50){text(c,name,(float)p[0]+19,(float)p[1]-7,8,muted,regular);lastX=p[0];lastY=p[1];}}catch(Exception ignored){}
-        }
+    }
+    private void drawStarNames(Canvas c,SkyMath.Camera camera,float h,Typeface regular){
+        paint.setStyle(Paint.Style.FILL);paint.setColor(0xe0e5dfd0);paint.setTextSize(9);paint.setTypeface(regular);paint.setTextAlign(Paint.Align.LEFT);
+        java.util.ArrayList<double[]> occupied=new java.util.ArrayList<>();
+        for(int i=0;i<catalog.named.length();i++)try{
+            JSONArray n=catalog.named.getJSONArray(i);if(n.getDouble(3)>scene.magnitude)continue;
+            double[] point=camera.project(SkyMath.equatorial(n.getDouble(1),n.getDouble(2)));
+            if(point==null||point[0]<5||point[0]>315||point[1]<12||point[1]>h-12)continue;
+            boolean crowded=false;for(double[] other:occupied)if(Math.hypot(point[0]-other[0],point[1]-other[1])<42){crowded=true;break;}
+            if(crowded)continue;
+            String raw=n.getString(0),name=NAMES.getOrDefault(raw,raw);
+            float x=(float)point[0]+7,y=(float)point[1]-5;
+            if(x+paint.measureText(name)>315)x=(float)point[0]-7-paint.measureText(name);
+            c.drawText(name,x,y,paint);occupied.add(point);
+        }catch(Exception ignored){}
     }
     private void drawAnalog(Canvas c,ZonedDateTime time,float x,float y,float r,int ink,Typeface font){
         c.save();c.translate(x,y);paint.setColor(ink);paint.setStrokeCap(Paint.Cap.ROUND);
