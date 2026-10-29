@@ -3,6 +3,7 @@ package app.starfield.wallpaper.test;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import app.starfield.wallpaper.MainActivity;
 import app.starfield.wallpaper.Settings;
 import app.starfield.wallpaper.SkyMath;
 import app.starfield.wallpaper.SkyPreview;
+import app.starfield.wallpaper.StarWallpaperService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
@@ -62,7 +64,10 @@ public final class AnnotationInstrumentation extends Instrumentation {
     @Override public void onStart(){
         Bundle result=new Bundle();Settings settings=new Settings(getTargetContext());SharedPreferences prefs=settings.prefs;Map<String,?> original=new HashMap<>(prefs.getAll());Activity activity=null;
         try{
-            check(getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==5,"Version code 5 installed");
+            android.content.pm.PackageManager packageManager=getTargetContext().getPackageManager();
+            check(packageManager.getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==6,"Version code 6 installed");
+            check("starwallpaper".contentEquals(packageManager.getApplicationLabel(getTargetContext().getApplicationInfo())),"Launcher application label is starwallpaper");
+            check("starwallpaper".contentEquals(packageManager.getServiceInfo(new ComponentName(getTargetContext(),StarWallpaperService.class),0).loadLabel(packageManager)),"Live wallpaper label is starwallpaper");
             long epoch=java.time.Instant.parse("2026-10-28T17:30:00Z").toEpochMilli();double[] sir=SkyMath.equatorial(6.752481,-16.716116);double[] horizontal=null;
             for(int hour=0;hour<24;hour++){long candidate=epoch+hour*3600000L;double[] ray=SkyMath.mv(SkyMath.camera(candidate,22.3193,114.1694,0,90,180,320,680).local,sir);if(ray[2]>.45){epoch=candidate;horizontal=ray;break;}}
             check(horizontal!=null,"Sirius visible in fixed test sky");

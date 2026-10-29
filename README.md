@@ -1,8 +1,8 @@
-# 星野 / Starfield
+# starwallpaper
 
 Android 17+ 原生星空动态壁纸：在锁屏上显示与日期、地点相对应的星空、月球与时钟。Java + OpenGL ES 3.0，离线运行，无广告、账号、分析上传或互联网权限。
 
-**当前版本：1.2.2 · 最低/目标/编译 API：37 · 自有代码：MIT**
+**当前版本：1.2.3 · 最低/目标/编译 API：37 · 自有代码：MIT**
 
 ![原生夜景效果](docs/screenshots/night.png)
 
@@ -23,7 +23,7 @@ Android 17+ 原生星空动态壁纸：在锁屏上显示与日期、地点相�
 
 自行构建 APK，或使用维护者未来在 GitHub Releases 发布的安装包。仓库不保存私钥或历史 APK。
 
-打开星野 → 调整设置 → 应用动态壁纸 → 在系统选择器选择桌面/锁屏目标。系统提供的目标随设备而异。系统时钟无法由普通壁纸隐藏，出现双时钟时请选择“使用系统时钟（仅星空）”。
+打开 starwallpaper → 调整设置 → 应用动态壁纸 → 在系统选择器选择桌面/锁屏目标。系统提供的目标随设备而异。系统时钟无法由普通壁纸隐藏，出现双时钟时请选择“使用系统时钟（仅星空）”。应用显示名称已更新，安装标识仍为 `app.starfield.wallpaper`，以便升级原有安装。
 
 首次安装默认香港、9 等、暗星亮度 120%、亮星大小 70%、闪烁强度 140%、180° FOV、方位角 94°、仰角 79°，跟随真实时间。升级保留原有偏好。“载入对话预览参数”会切到 2026-10-29 01:30 香港时间；开启“跟随真实日期和时间”即可恢复实时。
 
@@ -39,7 +39,7 @@ python tools/verify_android_catalog.py
 python tools/build_android.py
 ```
 
-输出：`dist/Starfield-1.2.2-android17.apk`。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
+输出：`dist/starwallpaper-1.2.3-android17.apk`。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
 
 也可用 Android Studio 打开 `android/`，指定 JDK 17+ 和 SDK 37；工程声明 AGP 9.1.1，需要 Gradle 9.3.1。仓库未附 Gradle Wrapper；已验证的命令行流水线是上述 Windows 脚本。完整说明见 [构建、测试与数据重建](docs/BUILDING.md)。
 

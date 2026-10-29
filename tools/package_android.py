@@ -9,17 +9,17 @@ from verify_open_source import verify
 ROOT=Path(__file__).resolve().parents[1]
 DIST=ROOT/'dist'
 version=ET.parse(ROOT/'android/app/src/main/AndroidManifest.xml').getroot().attrib['{http://schemas.android.com/apk/res/android}versionName']
-apk=DIST/f'Starfield-{version}-android17.apk'
+apk=DIST/f'starwallpaper-{version}-android17.apk'
 checksum=hashlib.sha256(apk.read_bytes()).hexdigest()
 expected=(DIST/'SHA256SUMS.txt').read_text().split()[0]
 assert checksum==expected
 sources=verify()
-out=DIST/f'Starfield-{version}-source.zip'
+out=DIST/f'starwallpaper-{version}-source.zip'
 with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
     for source in sorted(sources):
         relative=source.relative_to(ROOT).as_posix()
         assert '.signing' not in relative and '.toolchains' not in relative
-        archive.write(source,'Starfield/'+relative)
+        archive.write(source,'starwallpaper/'+relative)
 with zipfile.ZipFile(out) as archive:
     assert archive.testzip() is None
 report={'version':version,'applicationId':'app.starfield.wallpaper','minSdk':37,'targetSdk':37,'compileSdk':37,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':checksum,'catalogue':115570,'catalogueSource':'HYG v4.1, exact preview records','sourceArchive':out.name,'signing':'local RSA-3072 APK Signature Scheme v3','tested':'Android 17 / API 37 emulator; star-name and constellation controls; GLES pixel changes for names, lines and twinkle strength; exact Android/preview HYG and constellation data; native coordinate tests','notYetValidated':'OEM physical devices, AOD, long-duration battery measurements'}

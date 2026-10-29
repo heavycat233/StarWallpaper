@@ -54,7 +54,7 @@ def build():
     ENV['STARFIELD_SIGN_PASSWORD']=json.loads(passwordFile.read_text())['password']
     if not key.is_file():
         run([JDK/'bin/keytool.exe','-genkeypair','-keystore',key,'-storetype','JKS','-alias','starfield','-keyalg','RSA','-keysize','3072','-validity','10000','-dname','CN=Starfield Local Build, OU=Development, O=Starfield','-storepass:env','STARFIELD_SIGN_PASSWORD','-keypass:env','STARFIELD_SIGN_PASSWORD','-noprompt'],capture_output=True)
-    output=DIST/f'Starfield-{VERSION}-android17.apk'
+    output=DIST/f'starwallpaper-{VERSION}-android17.apk'
     run([JDK/'bin/java.exe','-jar',TOOLS/'lib/apksigner.jar','sign','--ks',key,'--ks-key-alias','starfield','--ks-pass','env:STARFIELD_SIGN_PASSWORD','--key-pass','env:STARFIELD_SIGN_PASSWORD','--out',output,BUILD/'aligned.apk'])
     result=run([JDK/'bin/java.exe','-jar',TOOLS/'lib/apksigner.jar','verify','--verbose','--print-certs',output],capture_output=True,text=True)
     (DIST/'APK-SIGNATURE.txt').write_text(result.stdout,encoding='utf-8');print(result.stdout,flush=True)

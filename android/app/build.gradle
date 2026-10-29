@@ -2,7 +2,7 @@ plugins { id 'com.android.application' }
 android {
     namespace 'app.starfield.wallpaper'
     compileSdk 37
-    defaultConfig { applicationId 'app.starfield.wallpaper'; minSdk 37; targetSdk 37; versionCode 5; versionName '1.2.2' }
+    defaultConfig { applicationId 'app.starfield.wallpaper'; minSdk 37; targetSdk 37; versionCode 6; versionName '1.2.3' }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
     buildTypes { release { minifyEnabled false } }
 }

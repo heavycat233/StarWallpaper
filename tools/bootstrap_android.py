@@ -14,7 +14,7 @@ DOWNLOADS = BASE / 'downloads'
 DOWNLOADS.mkdir(parents=True, exist_ok=True)
 
 def get_json(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Starfield-build/1.0'}), timeout=90) as response:
+    with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'starwallpaper-build/1.0'}), timeout=90) as response:
         return json.load(response)
 
 def download(url, name, checksum=None, algorithm='sha256'):
@@ -24,7 +24,7 @@ def download(url, name, checksum=None, algorithm='sha256'):
     if not valid():
         print('Downloading ' + name, flush=True)
         partial = target.with_suffix(target.suffix + '.partial')
-        with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Starfield-build/1.0'}), timeout=120) as response, partial.open('wb') as out:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'starwallpaper-build/1.0'}), timeout=120) as response, partial.open('wb') as out:
             shutil.copyfileobj(response, out, 1024 * 1024)
         partial.replace(target)
     if not valid():

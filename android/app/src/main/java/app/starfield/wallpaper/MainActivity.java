@@ -61,7 +61,7 @@ public final class MainActivity extends Activity {
         super.onCreate(saved);settings=new Settings(this);location=new LocationTracker(this,settings);
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(BG);body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(22),dp(12),dp(22),dp(32));scroll.addView(body,new ScrollView.LayoutParams(-1,-2));
         scroll.setOnApplyWindowInsetsListener((view,insets)->{android.graphics.Insets i=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());view.setPadding(i.left,i.top,i.right,i.bottom);return insets;});setContentView(scroll);
-        TextView brand=text("✦  星野",25,INK);brand.setLetterSpacing(.12f);body.addView(brand);TextView tagline=text("STARFIELD  /  此刻的真实星空",11,MUTED);tagline.setLetterSpacing(.12f);add(tagline,4,18);
+        TextView brand=text("✦  starwallpaper",25,INK);brand.setLetterSpacing(.12f);body.addView(brand);TextView tagline=text("STARWALLPAPER  /  此刻的真实星空",11,MUTED);tagline.setLetterSpacing(.12f);add(tagline,4,18);
         FrameLayout frame=new FrameLayout(this);frame.setBackground(shape(0xff242a36,24));frame.setPadding(dp(4),dp(4),dp(4),dp(4));frame.setClipToOutline(true);preview=new SkyPreview(this);frame.addView(preview,new FrameLayout.LayoutParams(-1,-1));LinearLayout.LayoutParams frameParams=new LinearLayout.LayoutParams(dp(200),dp(420));frameParams.gravity=Gravity.CENTER_HORIZONTAL;body.addView(frame,frameParams);
         subtitle=text("正在载入真实星图…",11,MUTED);subtitle.setGravity(Gravity.CENTER);add(subtitle,12,14);
         Button apply=button("应用动态壁纸",true);body.addView(apply,lp(-1,50));apply.setOnClickListener(v->applyWallpaper());
@@ -84,14 +84,14 @@ public final class MainActivity extends Activity {
         Button locate=button("更新当前位置",false);add(locate,2,5);locate.setOnClickListener(v->enableLocation());
         Button background=button("允许旅行时自动更新",false);add(background,2,5);background.setOnClickListener(v->backgroundLocation());locationStatus=text("",12,MUTED);add(locationStatus,2,8);note("位置只在本机使用。后台更新需在权限中选择“始终允许”；关闭定位或拒绝权限时，继续使用最近位置。锁屏可见时低频更新，后台定位可能受系统节电限制。");
         heading("日期与时间");realTime=toggle("跟随真实日期和时间",true,value->{settings.prefs.edit().putLong("fixedEpoch",settings.snapshot().epoch()).putBoolean("systemTime",value).apply();refresh();});dateStatus=text("",12,MUTED);add(dateStatus,4,8);Button customDate=button("选择观测日期与时间",false);add(customDate,2,10);customDate.setOnClickListener(v->pickDate());
-        heading("星图与隐私");Button about=button("星图来源、许可与使用说明",false);add(about,0,12);about.setOnClickListener(v->showAbout());note("星野 1.2.2 · Android 17+\n离线星表，无广告、无账号、无分析上传。\n银河光晕和暗云是按真实银道定位的艺术增强；白天仍显示星空。");
+        heading("星图与隐私");Button about=button("星图来源、许可与使用说明",false);add(about,0,12);about.setOnClickListener(v->showAbout());note("starwallpaper 1.2.3 · Android 17+\n离线星表，无广告、无账号、无分析上传。\n银河光晕和暗云是按真实银道定位的艺术增强；白天仍显示星空。");
         refresh();
     }
     private void focusMoon(boolean example){try{Settings.Snapshot s=settings.snapshot();long epoch=s.epoch();if(example){ZonedDateTime z=Instant.now().atZone(ZoneId.of(s.zone));for(int i=1;i<=30;i++){epoch=z.toLocalDate().plusDays(i).atTime(1,30).atZone(ZoneId.of(s.zone)).toInstant().toEpochMilli();if(CelestialLayer.horizontal(epoch,s.lat,s.lon)[1]>25)break;}settings.prefs.edit().putLong("fixedEpoch",epoch).putBoolean("systemTime",false).apply();}double[] h=CelestialLayer.horizontal(epoch,s.lat,s.lon);if(h[1]<=0){toast("月球当前位于地平线下，请选择其他时刻");return;}settings.prefs.edit().putBoolean("moon",true).putInt("azimuth",(int)Math.round((h[0]+(example?8:0))%360)).putInt("altitude",(int)Math.round(SkyMath.clamp(h[1]+(example?22:0),0,80))).apply();refresh();if(example)toast("夜景示例：指定日期，关闭示例请开启跟随真实日期和时间");}catch(Exception e){toast("星历尚未载入，请稍后重试");}}
     private void applyWallpaper(){
         WallpaperManager manager=WallpaperManager.getInstance(this);if(!manager.isWallpaperSupported()||!manager.isSetWallpaperAllowed()){toast("当前用户或设备不允许设置壁纸");return;}
         Intent intent=new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,new ComponentName(this,StarWallpaperService.class));
-        try{startActivity(intent);}catch(Exception e){try{startActivity(new Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER));}catch(Exception ignored){toast("请在系统壁纸设置中选择“星野”动态壁纸");}}
+        try{startActivity(intent);}catch(Exception e){try{startActivity(new Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER));}catch(Exception ignored){toast("请在系统壁纸设置中选择“starwallpaper”动态壁纸");}}
     }
     private void refresh(){
         binding=true;Settings.Snapshot s=settings.snapshot();clockSpinner.setSelection(s.clock.equals("analog")?1:s.clock.equals("none")?2:0);modeSpinner.setSelection(s.uiMode.equals("minimal")?0:1);
@@ -113,7 +113,7 @@ public final class MainActivity extends Activity {
     }
     private void backgroundLocation(){
         if(!LocationTracker.foregroundAllowed(this)){enableLocation();return;}
-        new AlertDialog.Builder(this).setTitle("旅行时更新星空位置").setMessage("在系统应用权限中将位置设为“始终允许”，星野才可在锁屏可见时低频获取位置。坐标只用于本机星图；关闭开关即可停止。设备的节电策略可能延迟更新。").setNegativeButton("取消",null).setPositiveButton("前往权限设置",(d,w)->{settings.flag("followLocation",true);startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName())));}).show();
+        new AlertDialog.Builder(this).setTitle("旅行时更新星空位置").setMessage("在系统应用权限中将位置设为“始终允许”，starwallpaper 才可在锁屏可见时低频获取位置。坐标只用于本机星图；关闭开关即可停止。设备的节电策略可能延迟更新。").setNegativeButton("取消",null).setPositiveButton("前往权限设置",(d,w)->{settings.flag("followLocation",true);startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName())));}).show();
     }
     @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] grants){super.onRequestPermissionsResult(code,permissions,grants);if(code==40){if(LocationTracker.foregroundAllowed(this))enableLocation();else{settings.flag("followLocation",false);refresh();toast("未获得定位权限，继续使用手动位置");}}}
     private void manualPosition(){

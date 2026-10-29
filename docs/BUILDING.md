@@ -32,7 +32,7 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 先安装主 APK 和 QA APK。仅在可清理的测试设备/模拟器运行，夹具会更改并恢复测试偏好；不要在日常设备运行历史夹具。
 
 ```powershell
-.toolchains/sdk/platform-tools/adb.exe install -r dist/Starfield-1.2.2-android17.apk
+.toolchains/sdk/platform-tools/adb.exe install -r dist/starwallpaper-1.2.3-android17.apk
 .toolchains/sdk/platform-tools/adb.exe install -r build/android/qa/starfield-qa.apk
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.CelestialInstrumentation
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.AnnotationInstrumentation
@@ -70,4 +70,4 @@ python tools/verify_open_source.py
 python tools/package_open_source.py
 ```
 
-只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/Starfield-open-source-1.2.2.zip` 可以直接解压后构建。
+只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/starwallpaper-open-source-1.2.3.zip` 可以直接解压后构建。
