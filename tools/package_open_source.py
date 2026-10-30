@@ -2,7 +2,7 @@
 import hashlib,json,zipfile
 from public_files import ROOT
 from verify_open_source import verify
-files=verify();out=ROOT/'dist/starwallpaper-open-source-1.2.3.zip';out.parent.mkdir(exist_ok=True)
+files=verify();out=ROOT/'dist/starwallpaper-open-source-1.2.4.zip';out.parent.mkdir(exist_ok=True)
 manifest={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
 with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
     for p in files:z.write(p,'starwallpaper/'+p.relative_to(ROOT).as_posix())

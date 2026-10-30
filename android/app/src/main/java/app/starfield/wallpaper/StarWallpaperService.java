@@ -3,6 +3,7 @@ package app.starfield.wallpaper;
 import android.app.KeyguardManager;
 import android.app.WallpaperColors;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -33,20 +34,33 @@ public final class StarWallpaperService extends WallpaperService {
         private long lastLockCheck;
         SkyEngine(){thread.start();renderHandler=new Handler(thread.getLooper());}
         private final Runnable draw=new Runnable(){@Override public void run(){
-            if(!visible||!surfaceAlive||renderer==null||surface==EGL14.EGL_NO_SURFACE)return;
+            if(!visible||!surfaceAlive)return;
             try{
+                if(renderer==null||surface==EGL14.EGL_NO_SURFACE){
+                    SurfaceHolder holder=getSurfaceHolder();
+                    if(holder==null)return;
+                    init(holder);
+                    Rect bounds=holder.getSurfaceFrame();
+                    renderer.onSurfaceChanged(null,bounds.width(),bounds.height());
+                }
                 long now=SystemClock.elapsedRealtime();Settings.Snapshot s=settings.snapshot();
                 if(now-lastLockCheck>1000){renderer.allowClock=isPreview()||s.desktopClock||(keyguard!=null&&keyguard.isKeyguardLocked());lastLockCheck=now;}
-                renderer.onDrawFrame(null);if(!EGL14.eglSwapBuffers(display,surface)){Log.w("Starfield","Surface swap deferred: "+EGL14.eglGetError());return;}
+                renderer.onDrawFrame(null);if(!EGL14.eglSwapBuffers(display,surface)){
+                    Log.w("Starfield","Surface swap failed; rebuilding EGL: "+EGL14.eglGetError());
+                    release();if(visible&&surfaceAlive)renderHandler.postDelayed(this,1000);return;
+                }
                 int fps=s.twinkle?s.fps:1;
                 if(visible)renderHandler.postDelayed(this,Math.max(10,1000/fps));
-            }catch(RuntimeException e){Log.e("Starfield","Wallpaper frame failed",e);}
+            }catch(RuntimeException e){
+                Log.e("Starfield","Wallpaper frame failed; retrying",e);
+                release();if(visible&&surfaceAlive)renderHandler.postDelayed(this,2000);
+            }
         }};
         @Override public void onCreate(SurfaceHolder holder){super.onCreate(holder);setOffsetNotificationsEnabled(false);setTouchEventsEnabled(false);}
         @Override public void onSurfaceCreated(SurfaceHolder holder){super.onSurfaceCreated(holder);surfaceAlive=true;}
         @Override public void onSurfaceChanged(SurfaceHolder holder,int format,int width,int height){
             super.onSurfaceChanged(holder,format,width,height);surfaceAlive=true;
-            renderHandler.post(()->{try{if(surface==EGL14.EGL_NO_SURFACE)init(holder);renderer.onSurfaceChanged(null,width,height);renderHandler.removeCallbacks(draw);if(visible)renderHandler.post(draw);}catch(RuntimeException e){Log.e("Starfield","EGL initialization failed",e);release();}});
+            renderHandler.post(()->{try{if(surface==EGL14.EGL_NO_SURFACE)init(holder);renderer.onSurfaceChanged(null,width,height);renderHandler.removeCallbacks(draw);if(visible)renderHandler.post(draw);}catch(RuntimeException e){Log.e("Starfield","EGL initialization failed; retrying",e);release();if(visible&&surfaceAlive)renderHandler.postDelayed(draw,2000);}});
         }
         @Override public void onSurfaceRedrawNeeded(SurfaceHolder holder){super.onSurfaceRedrawNeeded(holder);renderHandler.removeCallbacks(draw);renderHandler.post(draw);}
         @Override public void onVisibilityChanged(boolean value){visible=value;lastLockCheck=0;renderHandler.removeCallbacks(draw);if(value){location.start(false);renderHandler.post(draw);}else location.stop();}

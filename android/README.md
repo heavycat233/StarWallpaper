@@ -1,6 +1,6 @@
 # Android 原生工程
 
-当前版本 **1.2.3**；Java 17 / OpenGL ES 3.0。Android Studio 默认构建 API 37 的 Android 17 包；Android 16 / API 36 独立包由根目录的 `tools/bootstrap_android16.py`、`tools/build_android16.py` 生成。仓库没有 Gradle Wrapper。已验证的 Windows 命令行构建从仓库根目录运行：
+当前版本 **1.2.4**；Java 17 / OpenGL ES 3.0。Android Studio 默认构建 API 37 的 Android 17 包；Android 16 / API 36 独立包由根目录的 `tools/bootstrap_android16.py`、`tools/build_android16.py` 生成。仓库没有 Gradle Wrapper。已验证的 Windows 命令行构建从仓库根目录运行：
 
 ```text
 python tools/bootstrap_android.py

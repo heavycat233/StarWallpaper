@@ -37,7 +37,7 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 先安装主 APK 和 QA APK。仅在可清理的测试设备/模拟器运行，夹具会更改并恢复测试偏好；不要在日常设备运行历史夹具。
 
 ```powershell
-.toolchains/sdk/platform-tools/adb.exe install -r dist/starwallpaper-1.2.3-android17.apk
+.toolchains/sdk/platform-tools/adb.exe install -r dist/starwallpaper-1.2.4-android17.apk
 .toolchains/sdk/platform-tools/adb.exe install -r build/android/qa/starfield-qa.apk
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.CelestialInstrumentation
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.AnnotationInstrumentation
@@ -45,7 +45,7 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 
 `AnnotationInstrumentation` 验证亮星名称与星座开关在精简版可用、自动切换标准版，以及星名、星座和闪烁强度带来实际 GLES 像素变化。`CelestialInstrumentation` 验证数据库、预览参数、GLES 帧、月球和星云像素、亮星面积、指针模式、地平线下月球隐藏。其他夹具记录初期版本的设置或系统集成场景；`BrightnessInstrumentation` 和 `UpgradeSeedInstrumentation` 是早期升级夹具，预设不适用于当前版本。`SmokeInstrumentation` 的旧大星表断言也不作为本版回归入口。
 
-Android 16 安装包可使用 `python tools/bootstrap_emulator16.py` 准备官方 API 36 模拟器；系统镜像约 844 MB，测试环境须另有足够空间。安装 `dist/starwallpaper-1.2.3-android16.apk` 和 `build/android16/qa/starfield-qa.apk` 后，运行同一组 `AnnotationInstrumentation` 与 `CelestialInstrumentation`；本版两组均已在 API 36 模拟器通过。Android 17 模拟器准备脚本仍为 `tools/bootstrap_emulator.py`。
+Android 16 安装包可使用 `python tools/bootstrap_emulator16.py` 准备官方 API 36 模拟器；系统镜像约 844 MB，测试环境须另有足够空间。安装 `dist/starwallpaper-1.2.4-android16.apk` 和 `build/android16/qa/starfield-qa.apk` 后，运行同一组 `AnnotationInstrumentation` 与 `CelestialInstrumentation`。Android 17 模拟器准备脚本仍为 `tools/bootstrap_emulator.py`。
 
 ## 预览
 
@@ -77,4 +77,4 @@ python tools/verify_open_source.py
 python tools/package_open_source.py
 ```
 
-只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/starwallpaper-open-source-1.2.3.zip` 可以直接解压后构建。
+只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/starwallpaper-open-source-1.2.4.zip` 可以直接解压后构建。
