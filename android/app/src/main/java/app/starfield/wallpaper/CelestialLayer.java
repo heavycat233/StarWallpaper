@@ -9,13 +9,27 @@ import org.json.*;
 /** Offline Astronomy Engine sampled ephemeris, OpenNGC positions and NASA Moon map. */
 public final class CelestialLayer {
  private static volatile ByteBuffer table;private static double start,step;private static int count;
- private final JSONArray nebulae;private final Bitmap[] clouds;private final Bitmap moonMap;
+ private final JSONArray nebulae,galaxies;private final Bitmap[] clouds,galaxySprites;private final Bitmap moonMap;
  private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
  public CelestialLayer(Context c)throws Exception{
   synchronized(CelestialLayer.class){if(table==null){try(InputStream in=new GZIPInputStream(c.getAssets().open("moon-ephemeris.bin.gz"))){ByteBuffer loaded=ByteBuffer.wrap(in.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);start=loaded.getDouble(0);step=loaded.getDouble(8);count=loaded.getInt(16);table=loaded;}}}
   nebulae=new JSONArray(StarCatalog.readText(c,"nebulae.json"));clouds=new Bitmap[nebulae.length()];
   for(int i=0;i<clouds.length;i++)try(InputStream in=c.getAssets().open(nebulae.getJSONObject(i).getString("id")+".png")){clouds[i]=BitmapFactory.decodeStream(in);}
+  galaxies=new JSONArray(StarCatalog.readText(c,"galaxies.json"));galaxySprites=new Bitmap[galaxies.length()];
+  for(int i=0;i<galaxySprites.length;i++)galaxySprites[i]=galaxySprite(galaxies.getJSONObject(i),i);
   try(InputStream in=c.getAssets().open("moon.png")){moonMap=BitmapFactory.decodeStream(in);}
+ }
+ private static Bitmap galaxySprite(JSONObject galaxy,int index)throws JSONException{
+  int size=128;int[] pixels=new int[size*size];JSONArray color=galaxy.getJSONArray("color");
+  for(int y=0;y<size;y++)for(int x=0;x<size;x++){
+   double nx=(x-63.5)/64,ny=(y-63.5)/64,r=Math.hypot(nx,ny),angle=Math.atan2(ny,nx);
+   if(r>=1)continue;
+   double arm=.5+.5*Math.cos(2*angle-10*r+index*.8),bulge=Math.exp(-r*r*20),disk=Math.exp(-r*r*4.5)*(.22+.78*arm);
+   double dark=1-.36*Math.exp(-Math.pow(Math.sin(angle-5*r+index),2)/.035)*Math.min(1,r*2);
+   double opacity=SkyMath.clamp((bulge*.58+disk*.32)*dark*(1-r*r),0,1);
+   pixels[y*size+x]=Color.argb((int)(255*opacity),color.getInt(0),color.getInt(1),color.getInt(2));
+  }
+  return Bitmap.createBitmap(pixels,size,size,Bitmap.Config.ARGB_8888);
  }
  public static double[] sample(long epoch){
   double t=SkyMath.clamp((epoch-start)/step,0,count-1.000001);int i=(int)t;double f=t-i;double[] v=new double[11];
@@ -31,16 +45,30 @@ public final class CelestialLayer {
  }
  public static double[] horizontal(long epoch,double lat,double lon){SkyMath.Camera c=SkyMath.camera(epoch,lat,lon,0,90,150,320,680);double[] v=SkyMath.mv(c.local,moonRay(sample(epoch),c,lat));return new double[]{(Math.atan2(v[0],v[1])/SkyMath.D+360)%360,Math.asin(SkyMath.clamp(v[2],-1,1))/SkyMath.D};}
  public void drawClouds(Canvas canvas,SkyMath.Camera c,Settings.Snapshot s){
-  if(!s.nebulae||s.nebulaBrightness==0)return;
-  for(int i=0;i<clouds.length;i++)try{
+  if((!s.nebulae||s.nebulaBrightness==0)&&(!s.galaxies||s.galaxyBrightness==0))return;
+  if(s.nebulae&&s.nebulaBrightness>0)for(int i=0;i<clouds.length;i++)try{
    JSONObject n=nebulae.getJSONObject(i);double[] ray=SkyMath.equatorial(n.getDouble("ra"),n.getDouble("dec")),p=c.project(ray);if(p==null)continue;
    double[] east=unit(new double[]{-ray[1],ray[0],0}),north=unit(cross(ray,east));double factor=s.nebulaSize/100.0*SkyMath.D/120;
    double[] a=c.project(offset(ray,north,n.getDouble("major")*factor)),b=c.project(offset(ray,east,n.getDouble("minor")*factor));if(a==null||b==null)continue;
    Matrix matrix=new Matrix();matrix.setValues(new float[]{(float)((b[0]-p[0])/64),(float)((a[0]-p[0])/64),(float)(p[0]-(b[0]-p[0])-(a[0]-p[0])),(float)((b[1]-p[1])/64),(float)((a[1]-p[1])/64),(float)(p[1]-(b[1]-p[1])-(a[1]-p[1])),0,0,1});
    paint.setBlendMode(BlendMode.SCREEN);double strength=s.nebulaBrightness/100.0;for(int pass=0;pass<Math.ceil(strength);pass++){paint.setAlpha((int)(255*Math.min(1,strength-pass)));canvas.drawBitmap(clouds[i],matrix,paint);}paint.setBlendMode(null);paint.setAlpha(255);
   }catch(JSONException ignored){}
+  if(s.galaxies&&s.galaxyBrightness>0)for(int i=0;i<galaxySprites.length;i++)try{
+   JSONObject object=galaxies.getJSONObject(i);double[] ray=SkyMath.equatorial(object.getDouble("ra"),object.getDouble("dec")),p=c.project(ray);if(p==null)continue;
+   double[] east=unit(new double[]{-ray[1],ray[0],0}),north=unit(cross(ray,east));double pa=object.getDouble("pa")*SkyMath.D;
+   double[] major={north[0]*Math.cos(pa)+east[0]*Math.sin(pa),north[1]*Math.cos(pa)+east[1]*Math.sin(pa),north[2]*Math.cos(pa)+east[2]*Math.sin(pa)};
+   double[] minor={east[0]*Math.cos(pa)-north[0]*Math.sin(pa),east[1]*Math.cos(pa)-north[1]*Math.sin(pa),east[2]*Math.cos(pa)-north[2]*Math.sin(pa)};
+   double factor=s.galaxySize/100.0*SkyMath.D/120;
+   double[] a=c.project(offset(ray,major,object.getDouble("major")*factor)),b=c.project(offset(ray,minor,object.getDouble("minor")*factor));if(a==null||b==null)continue;
+   Matrix matrix=new Matrix();matrix.setValues(new float[]{(float)((b[0]-p[0])/64),(float)((a[0]-p[0])/64),(float)(p[0]-(b[0]-p[0])-(a[0]-p[0])),(float)((b[1]-p[1])/64),(float)((a[1]-p[1])/64),(float)(p[1]-(b[1]-p[1])-(a[1]-p[1])),0,0,1});
+   paint.setBlendMode(BlendMode.SCREEN);double strength=s.galaxyBrightness/100.0;for(int pass=0;pass<Math.ceil(strength);pass++){paint.setAlpha((int)(255*Math.min(1,strength-pass)));canvas.drawBitmap(galaxySprites[i],matrix,paint);}paint.setBlendMode(null);paint.setAlpha(255);
+  }catch(JSONException ignored){}
   // Extended clouds are clipped at the actual horizon too.
   paint.setBlendMode(BlendMode.CLEAR);for(int y=0;y<c.height;y+=3)for(int x=0;x<c.width;x+=3)if(SkyMath.mv(c.local,c.unproject(x+1.5,y+1.5))[2]<0)canvas.drawRect(x,y,x+3,y+3,paint);paint.setBlendMode(null);
+ }
+ public void drawGalaxyLabels(Canvas canvas,SkyMath.Camera camera){
+  paint.setColor(0xb7dbd4c2);paint.setTextSize(9);paint.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));paint.setTextAlign(Paint.Align.LEFT);
+  for(int i=0;i<galaxies.length();i++)try{JSONObject galaxy=galaxies.getJSONObject(i);double[] p=camera.project(SkyMath.equatorial(galaxy.getDouble("ra"),galaxy.getDouble("dec")));if(p!=null&&p[0]>8&&p[0]<camera.width-75&&p[1]>12&&p[1]<camera.height-12)canvas.drawText(galaxy.getString("name"),(float)p[0]+7,(float)p[1]-5,paint);}catch(JSONException ignored){}
  }
  public void drawMoon(Canvas canvas,SkyMath.Camera c,Settings.Snapshot s,long epoch){
   if(!s.moon)return;double[] v=sample(epoch),ray=moonRay(v,c,s.lat),p=c.project(ray);if(p==null)return;

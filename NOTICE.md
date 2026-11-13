@@ -5,12 +5,13 @@
 | 内容 | 来源与作者 | 许可与修改 |
 | --- | --- | --- |
 | HYG v4.1 恒星数据库 | David Nash / Astronomy Nexus，[HYG Database](https://github.com/astronexus/HYG-Database) | CC BY-SA 4.0。选取 V≤11、排除太阳，坐标/星等/色指数经量化、排序、gzip 压缩，115,570 条；这些派生数据仍按 CC BY-SA 4.0 提供。见 `LICENSES/CC-BY-SA-4.0.txt`、`data/HYG-LICENSE.txt`。 |
-| OpenNGC 星云目录 | Mattia Verga 与 OpenNGC contributors，[OpenNGC](https://github.com/mattiaverga/OpenNGC) | CC BY-SA 4.0。选取 12 处星云/遗迹坐标与角尺寸，派生子集继续使用同一许可。见 `data/OpenNGC-LICENSE.txt`。纹理由本项目程序生成。 |
+| OpenNGC 星云与河外星系目录 | Mattia Verga 与 OpenNGC contributors，[OpenNGC](https://github.com/mattiaverga/OpenNGC) | CC BY-SA 4.0。选取 12 处星云/遗迹，以及 M31、M33 的坐标与角尺寸；派生子集继续使用同一许可。见 `data/OpenNGC-LICENSE.txt`。纹理由本项目程序生成。 |
+| 流星雨年度参考资料 | [International Meteor Organization，2026 Meteor Shower Calendar](https://www.imo.net/files/meteor-shower/cal2026.pdf) | Table 5 的活动期、太阳黄经峰值、辐射点、ZHR 和亮度指数整理为 `data/meteor-showers.json`，来源与视觉加速限制均写入数据文件；按 IMO 原文条件及许可引用。 |
 | 星座连线和名称 | Olaf Frohn，[d3-celestial](https://github.com/ofrohn/d3-celestial) | BSD 3-Clause。以 J2000 GeoJSON 的 88 个星座、89 组连线转换为供 Android 和预览共用的紧凑坐标数据，保留原始文件及 `LICENSES/BSD-3-Clause-d3-celestial.txt`。连线是约定的示意图形，不是 IAU 星座边界。 |
 | Astronomy Engine 2.1.19 | Don Cross，[Astronomy Engine](https://github.com/cosinekitty/astronomy) | MIT。上游代码未修改，JavaScript 浏览器/CommonJS 版本随源码附带；月球星历表由该库计算。许可见 `LICENSES/MIT-Astronomy-Engine.txt`，也保留在上游文件头。 |
 | 月面贴图 | NASA SVS / Ernie Wright；LROC 与 LOLA 团队，[CGI Moon Kit](https://svs.gsfc.nasa.gov/4720/) | NASA SVS 将其内容作为公共领域材料提供，另有标注的除外，参见[使用说明](https://svs.gsfc.nasa.gov/help/#frequently-asked-questions)。本项目使用页面的 `lroc_color_2k.jpg`，缩为 256×128 灰度贴图，再压缩内嵌。保留来源与科学团队鸣谢，不表示 NASA 背书。 |
 
-数据范围包括 `data/catalogue.b64`、`data/catalogue-meta.json`、`data/celestials.json` 中的目录字段及 Android 对应的 `stars.bin.gz`、`catalogue.json`、`nebulae.json`。生成的自包含预览也内嵌这些数据，分发时须同时保留本说明与数据许可证。
+数据范围包括 `data/catalogue.b64`、`data/catalogue-meta.json`、`data/celestials.json`、`data/galaxies.json`、`data/meteor-showers.json` 中的目录字段及 Android 对应资产。生成的自包含预览也内嵌这些数据，分发时须同时保留本说明与适用的数据许可证及来源说明。
 
 仓库中的手机效果图由本项目生成，属于界面/渲染示例；不代表恒星观测照片。它们含上述数据和素材，应保留本文件的归属信息。
 

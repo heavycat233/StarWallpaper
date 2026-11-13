@@ -2,7 +2,7 @@
 
 Android 16+ 原生星空动态壁纸：在锁屏上显示与日期、地点相对应的星空、月球与时钟。Java + OpenGL ES 3.0，离线运行，无广告、账号、分析上传或互联网权限。
 
-**当前版本：1.2.4 · Android 16 / API 36 与 Android 17 / API 37 各有独立安装包 · 自有代码：MIT**
+**当前版本：1.2.5 · Android 16 / API 36 与 Android 17 / API 37 各有独立安装包 · 自有代码：MIT**
 
 ![原生夜景效果](docs/screenshots/night.png)
 
@@ -16,6 +16,8 @@ Android 16+ 原生星空动态壁纸：在锁屏上显示与日期、地点相�
 - 亮星名称可开关；88 个星座的连线与中文名称可显示。开启文字标注会切换到标准版。
 - 星点闪烁及其强度（0–200%）、亮星大小、暗星亮度、银河光晕与暗云分别可调。
 - 12 处按 OpenNGC 坐标定位的星云，以及随日期与位置变化的月球、月相和月面纹理。
+- 仙女座星系 M31 与三角座星系 M33：OpenNGC 位置及角尺寸，艺术化螺旋纹理；显示、亮度与尺寸可调。
+- 流星可开关、调节效果密度；按 IMO 流星雨活动期、太阳黄经、辐射点和亮度分布改变出现频率与视觉大小。黄道光可选，晨昏沿黄道显示。
 - 手动城市/经纬度/时区，或经用户授权跟随位置；可指定观测时间。
 - “载入对话预览参数”可载入香港夜景的同一组参数，方便对比安卓与预览。
 
@@ -44,7 +46,7 @@ python tools/build_android16.py
 python tools/verify_android16.py
 ```
 
-输出：`dist/starwallpaper-1.2.4-android17.apk` 与 `dist/starwallpaper-1.2.4-android16.apk`。Android 16 设备选后者；Android 17 设备优先选前者。两个包使用相同安装标识与签名，不能同时安装。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
+输出：`dist/starwallpaper-1.2.5-android17.apk` 与 `dist/starwallpaper-1.2.5-android16.apk`。Android 16 设备选后者；Android 17 设备优先选前者。两个包使用相同安装标识与签名，不能同时安装。脚本下载并校验官方 JDK/Android 工具，隔离到 `.toolchains/`，不改系统安装。首次构建生成你自己的本地签名，位于 `.signing/`。自己的签名无法覆盖其他维护者签名的安装。
 
 也可用 Android Studio 打开 `android/`，指定 JDK 17+ 和 SDK 37；Gradle 工程默认构建 Android 17 包。Android 16 包由 `tools/build_android16.py` 使用官方 SDK 36 独立构建。工程声明 AGP 9.1.1，需要 Gradle 9.3.1。仓库未附 Gradle Wrapper；已验证的命令行流水线是上述 Windows 脚本。完整说明见 [构建、测试与数据重建](docs/BUILDING.md)。
 
@@ -59,7 +61,7 @@ python tools/serve_preview.py
 ## 开发与验证
 
 ```text
-node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs
+node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs tests/event-math.test.cjs
 python tools/verify_android_catalog.py
 python tools/verify_open_source.py
 ```
@@ -82,6 +84,6 @@ GitHub Actions 配置了数学测试、数据/发布检查和 Windows 原生构�
 
 程序代码使用 [MIT](LICENSE)。HYG 和 OpenNGC 派生数据保留 [CC BY-SA 4.0](LICENSES/CC-BY-SA-4.0.txt)，星座数据保留 [BSD 3-Clause](LICENSES/BSD-3-Clause-d3-celestial.txt)，Astronomy Engine 保留 MIT，NASA 月面贴图保留来源与团队鸣谢。各文件范围、来源和修改方式见 [NOTICE](NOTICE.md)；根目录 MIT 不替代第三方许可。
 
-银河与星云色彩/纹理经过艺术增强，星云和月球默认采用艺术放大，均可调回真实角尺寸。白天仍显示星空，未模拟日光、月光照亮天空、折射和光污染；星图用于壁纸效果，不用于精密观测。不同屏幕比例、字体与抗锯齿会影响最终画面。
+银河、星云和河外星系纹理经过艺术增强，默认采用艺术放大，星云和星系可调回真实角尺寸。流星雨数据以 IMO 2026 年度日历为季节参考，逐年峰值与实际每小时可见数量可能变化；画面将流星事件加速约 20 倍以便观赏，星点大小反映的是按流星亮度指数抽样的视亮度，而非实测物理直径。黄道光是以太阳方向和黄道面生成的示意效果，仅在晨昏太阳位于地平线下时出现。白天仍显示星空，未模拟日光、月光照亮天空、折射和光污染；星图用于壁纸效果，不用于精密观测。不同屏幕比例、字体与抗锯齿会影响最终画面。
 
 已完成 Android 16 与 17 模拟器上的安装、渲染和指定场景像素校验；两版均验证了清除最近任务后壁纸仍显示，16 版还验证了覆盖更新。厂商真机、AOD 与长期耗电仍需验证。定位信息仅在设备本地处理，拒绝授权时仍可手动使用。

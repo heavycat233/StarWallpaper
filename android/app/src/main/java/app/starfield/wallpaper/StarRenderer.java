@@ -37,7 +37,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     private int galaxyW,galaxyH;
     private StarCatalog catalog;
     private ConstellationOverlay constellations;
-    private CelestialLayer celestial;private int cloudTexture;private Bitmap cloudOverlay;
+    private CelestialLayer celestial;private MeteorLayer meteors;private int cloudTexture,meteorTexture;private Bitmap cloudOverlay,meteorOverlay;
     private long galaxyTime=Long.MIN_VALUE,overlayTime=Long.MIN_VALUE;
     private int galaxyVersion=-1,overlayVersion=-1;
     private boolean overlayClock;
@@ -51,8 +51,8 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     @Override public void onSurfaceCreated(GL10 ignored,EGLConfig config){
         error=null;uniformCache.clear();galaxyTime=Long.MIN_VALUE;overlayTime=Long.MIN_VALUE;seenVersion=-1;
         try{
-            catalog=StarCatalog.get(context);celestial=new CelestialLayer(context);constellations=new ConstellationOverlay(context);
-            int[] vaos=new int[2],buffers=new int[2],textures=new int[3],fbos=new int[1];
+            catalog=StarCatalog.get(context);celestial=new CelestialLayer(context);meteors=new MeteorLayer(context);constellations=new ConstellationOverlay(context);
+            int[] vaos=new int[2],buffers=new int[2],textures=new int[4],fbos=new int[1];
             GLES30.glGenVertexArrays(2,vaos,0);quadVao=vaos[0];starVao=vaos[1];GLES30.glGenBuffers(2,buffers,0);quadVbo=buffers[0];starVbo=buffers[1];
             FloatBuffer quad=ByteBuffer.allocateDirect(8*4).order(ByteOrder.nativeOrder()).asFloatBuffer();quad.put(new float[]{-1,-1,1,-1,-1,1,1,1}).position(0);
             GLES30.glBindVertexArray(quadVao);GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER,quadVbo);GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,32,quad,GLES30.GL_STATIC_DRAW);GLES30.glEnableVertexAttribArray(0);GLES30.glVertexAttribPointer(0,2,GLES30.GL_FLOAT,false,8,0);
@@ -62,7 +62,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
             GLES30.glEnableVertexAttribArray(1);GLES30.glVertexAttribPointer(1,1,GLES30.GL_FLOAT,false,20,12);
             GLES30.glEnableVertexAttribArray(2);GLES30.glVertexAttribPointer(2,1,GLES30.GL_FLOAT,false,20,16);
             galaxyProgram=program("shaders/quad.vert","shaders/galaxy.frag");starsProgram=program("shaders/stars.vert","shaders/stars.frag");textureProgram=program("shaders/quad.vert","shaders/texture.frag");
-            GLES30.glGenTextures(3,textures,0);galaxyTexture=textures[0];overlayTexture=textures[1];cloudTexture=textures[2];
+            GLES30.glGenTextures(4,textures,0);galaxyTexture=textures[0];overlayTexture=textures[1];cloudTexture=textures[2];meteorTexture=textures[3];
             for(int texture:textures){GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,texture);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);}
             GLES30.glGenFramebuffers(1,fbos,0);framebuffer=fbos[0];GLES30.glBindVertexArray(0);
             GLES30.glClearColor(.02f,.04f,.09f,1);
@@ -73,6 +73,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,galaxyTexture);GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D,0,GLES30.GL_RGBA,galaxyW,galaxyH,0,GLES30.GL_RGBA,GLES30.GL_UNSIGNED_BYTE,null);
         int overlayWidth=Math.min(this.width,768);if(overlay!=null)overlay.recycle();overlay=Bitmap.createBitmap(overlayWidth,Math.max(1,Math.round((float)overlayWidth*this.height/this.width)),Bitmap.Config.ARGB_8888);
         if(cloudOverlay!=null)cloudOverlay.recycle();cloudOverlay=Bitmap.createBitmap(overlay.getWidth(),overlay.getHeight(),Bitmap.Config.ARGB_8888);
+        if(meteorOverlay!=null)meteorOverlay.recycle();int meteorWidth=Math.min(this.width,512);meteorOverlay=Bitmap.createBitmap(meteorWidth,Math.max(1,Math.round((float)meteorWidth*this.height/this.width)),Bitmap.Config.ARGB_8888);
         galaxyTime=Long.MIN_VALUE;overlayTime=Long.MIN_VALUE;
     }
     @Override public void onDrawFrame(GL10 ignored){
@@ -82,12 +83,13 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
         long epoch=scene.epoch();SkyMath.Camera camera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,width,height);
         if(galaxyTime!=epoch/10000||galaxyVersion!=version){
             GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,framebuffer);GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER,GLES30.GL_COLOR_ATTACHMENT0,GLES30.GL_TEXTURE_2D,galaxyTexture,0);GLES30.glViewport(0,0,galaxyW,galaxyH);GLES30.glDisable(GLES30.GL_BLEND);
-            GLES30.glUseProgram(galaxyProgram);cameraUniforms(galaxyProgram,camera);GLES30.glUniformMatrix3fv(uniform(galaxyProgram,"uInverse"),1,false,SkyMath.glMatrix(camera.inverse),0);GLES30.glUniform1f(uniform(galaxyProgram,"uGlow"),scene.glow/100f);GLES30.glUniform1f(uniform(galaxyProgram,"uDust"),scene.dust/100f);quad();
+            GLES30.glUseProgram(galaxyProgram);cameraUniforms(galaxyProgram,camera);GLES30.glUniformMatrix3fv(uniform(galaxyProgram,"uInverse"),1,false,SkyMath.glMatrix(camera.inverse),0);GLES30.glUniform1f(uniform(galaxyProgram,"uGlow"),scene.glow/100f);GLES30.glUniform1f(uniform(galaxyProgram,"uDust"),scene.dust/100f);vector(galaxyProgram,"uSun",SkyEvents.sunRay(epoch));vector(galaxyProgram,"uEclipticNormal",SkyEvents.ECLIPTIC_NORMAL);GLES30.glUniform1f(uniform(galaxyProgram,"uZodiacal"),scene.zodiacalLight?(float)(SkyEvents.zodiacalPhase(camera,epoch)*scene.zodiacalBrightness/100.0):0f);quad();
             GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,0);GLES30.glViewport(0,0,width,height);galaxyTime=epoch/10000;galaxyVersion=version;
             Canvas clouds=new Canvas(cloudOverlay);clouds.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);celestial.drawClouds(clouds,SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,cloudOverlay.getWidth(),cloudOverlay.getHeight()),scene);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,cloudTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,cloudOverlay,0);
         }
         GLES30.glDisable(GLES30.GL_BLEND);texture(galaxyTexture,false);GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(cloudTexture,true);
         GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);GLES30.glUseProgram(starsProgram);cameraUniforms(starsProgram,camera);GLES30.glUniformMatrix3fv(uniform(starsProgram,"uLocal"),1,false,SkyMath.glMatrix(camera.local),0);GLES30.glUniform1f(uniform(starsProgram,"uTime"),(SystemClock.elapsedRealtime()%600000)/1000f);GLES30.glUniform1f(uniform(starsProgram,"uPixelScale"),Math.max(.85f,width/320f));GLES30.glUniform1f(uniform(starsProgram,"uFaintBrightness"),scene.faintBrightness/100f);GLES30.glUniform1f(uniform(starsProgram,"uBrightSize"),scene.brightSize/100f);GLES30.glUniform1f(uniform(starsProgram,"uTwinkleStrength"),scene.twinkleStrength/100f);GLES30.glUniform1i(uniform(starsProgram,"uTwinkle"),scene.twinkle?1:0);GLES30.glBindVertexArray(starVao);int total=catalog.counts[scene.magnitude],bright=Math.min(total,catalog.dynamicCount);if(total>bright)GLES30.glDrawArrays(GLES30.GL_POINTS,bright,total-bright);GLES30.glDrawArrays(GLES30.GL_POINTS,0,bright);
+        if(scene.meteors&&scene.meteorDensity>0){Canvas motion=new Canvas(meteorOverlay);motion.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);SkyMath.Camera meteorCamera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,meteorOverlay.getWidth(),meteorOverlay.getHeight());if(meteors.draw(motion,meteorCamera,scene,epoch,version)){GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,meteorTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,meteorOverlay,0);GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(meteorTexture,true);}}
         long overlayBucket=epoch/(scene.clock.equals("analog")?1000:60000);
         if(overlayTime!=overlayBucket||overlayVersion!=version||overlayClock!=allowClock){
             drawOverlay(epoch);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,overlayTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,overlay,0);overlayTime=overlayBucket;overlayVersion=version;overlayClock=allowClock;
@@ -109,7 +111,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
         if(scene.constellations||scene.labels){
             SkyMath.Camera camera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,320,Math.round(h));
             if(scene.constellations)constellations.draw(c,camera);
-            if(scene.labels)drawStarNames(c,camera,h,regular);
+            if(scene.labels){drawStarNames(c,camera,h,regular);if(scene.galaxies)celestial.drawGalaxyLabels(c,camera);}
         }
         celestial.drawMoon(c,SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,320,Math.round(h)),scene,epoch);
         paint.setShader(new android.graphics.LinearGradient(0,0,0,h,new int[]{0x88030613,0x10030613,0x00030613,0x08030613,0xb0030613},new float[]{0,.24f,.51f,.65f,1},android.graphics.Shader.TileMode.CLAMP));paint.setColor(Color.WHITE);paint.setStyle(Paint.Style.FILL);c.drawRect(0,0,320,h,paint);paint.setShader(null);
@@ -149,5 +151,5 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
         hand(c,(time.getHour()%12+time.getMinute()/60.0)*Math.PI/6,r*.52f,3f,ink);hand(c,(time.getMinute()+time.getSecond()/60.0)*Math.PI/30,r*.77f,1.8f,ink);hand(c,time.getSecond()*Math.PI/30,r*.86f,.8f,Color.rgb(212,184,139));paint.setColor(ink);c.drawCircle(0,0,2.8f,paint);c.restore();
     }
     private void hand(Canvas c,double angle,float length,float stroke,int color){paint.setColor(color);paint.setStrokeWidth(stroke);paint.setStrokeCap(Paint.Cap.ROUND);c.drawLine(-(float)Math.sin(angle)*7,(float)Math.cos(angle)*7,(float)Math.sin(angle)*length,-(float)Math.cos(angle)*length,paint);}
-    public void close(){settings.close();if(cloudOverlay!=null){cloudOverlay.recycle();cloudOverlay=null;}if(overlay!=null){overlay.recycle();overlay=null;}}
+    public void close(){settings.close();if(cloudOverlay!=null){cloudOverlay.recycle();cloudOverlay=null;}if(meteorOverlay!=null){meteorOverlay.recycle();meteorOverlay=null;}if(overlay!=null){overlay.recycle();overlay=null;}}
 }

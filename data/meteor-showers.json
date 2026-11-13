@@ -1,0 +1,18 @@
+{
+  "source":"International Meteor Organization, 2026 Meteor Shower Calendar, Table 5. https://www.imo.net/files/meteor-shower/cal2026.pdf",
+  "note":"Activity dates, solar longitudes, peak ZHR, radiant at maximum and population index r are reference values. Peak dates and rates vary by year. Animated event frequency is accelerated for wallpaper visibility.",
+  "showers":[
+    {"id":"QUA","name":"象限仪座流星雨","start":1228,"end":112,"peakSolar":283.15,"ra":230,"dec":49,"zhr":80,"r":2.1,"widthDays":0.65},
+    {"id":"LYR","name":"天琴座流星雨","start":414,"end":430,"peakSolar":32.32,"ra":271,"dec":34,"zhr":18,"r":2.1,"widthDays":1.8},
+    {"id":"ETA","name":"宝瓶座η流星雨","start":419,"end":528,"peakSolar":45.5,"ra":338,"dec":-1,"zhr":50,"r":2.4,"widthDays":4},
+    {"id":"SDA","name":"宝瓶座δ南流星雨","start":712,"end":823,"peakSolar":128,"ra":340,"dec":-16,"zhr":25,"r":2.5,"widthDays":5},
+    {"id":"PER","name":"英仙座流星雨","start":717,"end":824,"peakSolar":140,"ra":48,"dec":58,"zhr":100,"r":2.2,"widthDays":2.2},
+    {"id":"DRA","name":"天龙座流星雨","start":1006,"end":1010,"peakSolar":195.4,"ra":262,"dec":54,"zhr":5,"r":2.6,"widthDays":0.8},
+    {"id":"ORI","name":"猎户座流星雨","start":1002,"end":1107,"peakSolar":208,"ra":95,"dec":16,"zhr":20,"r":2.5,"widthDays":3},
+    {"id":"STA","name":"金牛座南流星雨","start":920,"end":1120,"peakSolar":223,"ra":52,"dec":15,"zhr":7,"r":2.3,"widthDays":12},
+    {"id":"NTA","name":"金牛座北流星雨","start":1020,"end":1210,"peakSolar":230,"ra":58,"dec":22,"zhr":5,"r":2.3,"widthDays":10},
+    {"id":"LEO","name":"狮子座流星雨","start":1106,"end":1130,"peakSolar":235.27,"ra":152,"dec":22,"zhr":15,"r":2.5,"widthDays":2},
+    {"id":"GEM","name":"双子座流星雨","start":1204,"end":1220,"peakSolar":262.2,"ra":112,"dec":33,"zhr":150,"r":2.6,"widthDays":2.3},
+    {"id":"URS","name":"小熊座流星雨","start":1217,"end":1226,"peakSolar":270.7,"ra":217,"dec":76,"zhr":10,"r":2.8,"widthDays":1.2}
+  ]
+}

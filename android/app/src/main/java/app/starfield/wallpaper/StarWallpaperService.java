@@ -49,7 +49,7 @@ public final class StarWallpaperService extends WallpaperService {
                     Log.w("Starfield","Surface swap failed; rebuilding EGL: "+EGL14.eglGetError());
                     release();if(visible&&surfaceAlive)renderHandler.postDelayed(this,1000);return;
                 }
-                int fps=s.twinkle?s.fps:1;
+                int fps=(s.twinkle&&s.twinkleStrength>0||s.meteors&&s.meteorDensity>0)?s.fps:1;
                 if(visible)renderHandler.postDelayed(this,Math.max(10,1000/fps));
             }catch(RuntimeException e){
                 Log.e("Starfield","Wallpaper frame failed; retrying",e);

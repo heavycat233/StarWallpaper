@@ -4,9 +4,9 @@ precision highp int;
 in vec2 vUv;
 out vec4 fragColor;
 uniform mat3 uInverse;
-uniform vec3 uRight,uUp,uCenter;
+uniform vec3 uRight,uUp,uCenter,uSun,uEclipticNormal;
 uniform vec2 uSize;
-uniform float uScale,uGlow,uDust;
+uniform float uScale,uGlow,uDust,uZodiacal;
 float hash(vec3 p){uvec3 q=uvec3(ivec3(p));uint h=q.x*374761393u+q.y*668265263u+q.z*2147483647u;h=(h^(h>>13))*1274126177u;return float(h^(h>>16))/4294967295.;}
 float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
 void main(){
@@ -25,5 +25,14 @@ void main(){
     float g=max(0.,(broad*10.+middle*20.*turbulence+narrow*17.*turbulence)*density*(1.-min(.94,dark))*uGlow);
     float vignette=max(.43,1.-dot(vUv-.5,vUv-.5)*1.05),horizon=clamp(local.z*8.,.15,1.);
     vec3 rgb=(vec3(5,10,23)+g*vec3(.84+core*.28,.88+core*.12,1.17))*vignette*horizon/255.;
+    if(uZodiacal>0.){
+        float elongation=acos(clamp(dot(q,uSun),-1.,1.));
+        float eclipticLatitude=asin(clamp(dot(q,uEclipticNormal),-1.,1.));
+        float width=.055+.12*elongation;
+        float cone=exp(-pow(eclipticLatitude/width,2.));
+        float reach=1.-smoothstep(.10,1.55,elongation);
+        float nearHorizon=smoothstep(0.,.08,local.z)*(1.-smoothstep(.55,.92,local.z));
+        rgb+=vec3(24.,20.,14.)/255.*cone*reach*reach*nearHorizon*uZodiacal;
+    }
     fragColor=vec4(rgb,1.);
 }

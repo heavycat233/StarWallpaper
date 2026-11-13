@@ -5,6 +5,8 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'android/app/src/main/assets'; data=json.loads((ROOT/'data/celestials.json').read_text(encoding='utf-8'))
 tex=data['moonTexture'];Image.frombytes('L',(tex['width'],tex['height']),gzip.decompress(base64.b64decode(tex['data']))).save(OUT/'moon.png')
 (OUT/'nebulae.json').write_text(json.dumps(data['nebulae'],ensure_ascii=False),encoding='utf-8')
+shutil.copyfile(ROOT/'data/galaxies.json',OUT/'galaxies.json')
+shutil.copyfile(ROOT/'data/meteor-showers.json',OUT/'meteor-showers.json')
 def hash3(x,y,z):
     h=(x*374761393+y*668265263+z*2147483647)&0xffffffff
     h=((h^(h>>13))*1274126177)&0xffffffff
@@ -29,4 +31,4 @@ for idx,n in enumerate(data['nebulae']):
     img.save(OUT/(n['id']+'.png'))
 shutil.copyfile(ROOT/'data/OpenNGC-LICENSE.txt',OUT/'OpenNGC-LICENSE.txt')
 license=(ROOT/'vendor/astronomy/astronomy.browser.min.js').read_text(encoding='utf-8').split('*/',1)[0]+'*/'
-(OUT/'CELESTIAL-LICENSE.txt').write_text('Moon ephemeris derived from Astronomy Engine 2.1.19, Don Cross. MIT.\n'+license+'\nNebula positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. Procedural artistic textures.\nMoon map: NASA SVS CGI Moon Kit https://svs.gsfc.nasa.gov/4720/ Ernie Wright / LROC / LOLA. Resampled grayscale.\nEphemeris: 1900-2101, six-hour J2000 samples with linear interpolation; visual use only.\n',encoding='utf-8')
+(OUT/'CELESTIAL-LICENSE.txt').write_text('Moon ephemeris derived from Astronomy Engine 2.1.19, Don Cross. MIT.\n'+license+'\nNebula and M31/M33 galaxy positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. Procedural artistic textures.\nMeteor shower timing/radiants/rates/population indices: International Meteor Organization 2026 Meteor Shower Calendar, https://www.imo.net/files/meteor-shower/cal2026.pdf . Statistical decorative animation, not an observation forecast.\nMoon map: NASA SVS CGI Moon Kit https://svs.gsfc.nasa.gov/4720/ Ernie Wright / LROC / LOLA. Resampled grayscale.\nEphemeris: 1900-2101, six-hour J2000 samples with linear interpolation; visual use only.\n',encoding='utf-8')

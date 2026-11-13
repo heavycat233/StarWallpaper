@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs
+      - run: node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs tests/event-math.test.cjs
       - run: python tools/verify_android_catalog.py
       - run: python tools/verify_open_source.py
       - run: python tools/build_preview.py

@@ -28,6 +28,7 @@ Moon ephemeris derived from Astronomy Engine 2.1.19, Don Cross. MIT.
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
-Nebula positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. Procedural artistic textures.
+Nebula and M31/M33 galaxy positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. Procedural artistic textures.
+Meteor shower timing/radiants/rates/population indices: International Meteor Organization 2026 Meteor Shower Calendar, https://www.imo.net/files/meteor-shower/cal2026.pdf . Statistical decorative animation, not an observation forecast.
 Moon map: NASA SVS CGI Moon Kit https://svs.gsfc.nasa.gov/4720/ Ernie Wright / LROC / LOLA. Resampled grayscale.
 Ephemeris: 1900-2101, six-hour J2000 samples with linear interpolation; visual use only.

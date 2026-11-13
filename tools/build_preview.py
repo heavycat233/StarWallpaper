@@ -19,6 +19,8 @@ fragment = fragment.replace('<!-- CATALOGUE -->', '<script>window.STAR_CATALOGUE
 fragment = fragment.replace('<!-- CONSTELLATIONS -->', '<script>window.STAR_CONSTELLATIONS=' + (ROOT/'data/constellations.json').read_text(encoding='utf-8') + ';</script>')
 fragment = fragment.replace('<!-- ASTRONOMY -->', '<script>\n' + (ROOT/'vendor/astronomy/astronomy.browser.min.js').read_text(encoding='utf-8') + '\n</script>')
 fragment = fragment.replace('<!-- CELESTIAL_DATA -->','<script>window.STAR_CELESTIAL_DATA='+(ROOT/'data/celestials.json').read_text(encoding='utf-8')+';</script>')
+fragment = fragment.replace('<!-- EVENTS_DATA -->','<script>window.STAR_GALAXIES='+(ROOT/'data/galaxies.json').read_text(encoding='utf-8')+';window.STAR_METEOR_SHOWERS='+json.dumps(json.loads((ROOT/'data/meteor-showers.json').read_text(encoding='utf-8'))['showers'],ensure_ascii=False,separators=(',',':'))+';</script>')
+fragment = fragment.replace('<!-- EVENTS_MATH -->','<script>\n'+(ROOT/'preview/event-math.js').read_text(encoding='utf-8')+'\n</script>')
 fragment = fragment.replace('<!-- CELESTIAL_MATH -->','<script>\n'+(ROOT/'preview/celestial-math.js').read_text(encoding='utf-8')+'\n</script>')
 fragment = fragment.replace('<!-- PREVIEW_SCRIPT -->', '<script>\n' + (ROOT / 'preview/preview.js').read_text(encoding='utf-8') + '\n</script>')
 out = ROOT / 'preview/star-wallpaper.html'

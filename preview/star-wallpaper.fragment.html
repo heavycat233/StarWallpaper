@@ -1,5 +1,5 @@
 <div id="starwall-preview" aria-label="starwallpaper 锁屏壁纸设计预览">
-  <div class="sw-top"><div class="sw-brand"><span class="sw-mark">✦</span><span>starwallpaper</span></div><span class="sw-platform">ANDROID 17+ · 设计预览</span></div>
+  <div class="sw-top"><div class="sw-brand"><span class="sw-mark">✦</span><span>starwallpaper</span></div><span class="sw-platform">ANDROID 16+ · 设计预览</span></div>
   <div class="sw-layout">
     <div class="sw-stage viz-dotted-background">
       <div class="sw-phone" aria-label="手机锁屏效果">
@@ -44,13 +44,22 @@
       <div class="sw-switches"><label><span><i data-lucide="sparkles" aria-hidden="true"></i> 星点闪烁</span><input id="sw-twinkle" type="checkbox" role="switch" checked></label><label><span><i data-lucide="orbit" aria-hidden="true"></i> 亮星名称</span><input id="sw-labels" type="checkbox" role="switch"></label><label><span><i data-lucide="stars" aria-hidden="true"></i> 星座连线与名称</span><input id="sw-constellations" type="checkbox" role="switch"></label></div>
       <div class="sw-control"><label for="sw-twinkle-strength">闪烁强度 <output id="sw-twinkle-value">140%</output></label><input id="sw-twinkle-strength" aria-label="闪烁强度" type="range" min="0" max="200" step="10" value="140"><div class="sw-range-labels"><span>0% · 不闪烁</span><span>200% · 明显</span></div></div>
       <p class="sw-annotation-note">开启星名或星座时自动切换标准版。</p>
-      <details class="sw-celestial-settings" open><summary class="cursor-interaction">星云与月球</summary>
-        <div class="sw-switches"><label><span>真实位置星云</span><input id="sw-nebulae" type="checkbox" role="switch" checked></label><label><span>月球与月相</span><input id="sw-moon" type="checkbox" role="switch" checked></label></div>
+      <details class="sw-celestial-settings" open><summary class="cursor-interaction">星云、河外星系与月球</summary>
+        <div class="sw-switches"><label><span>真实位置星云</span><input id="sw-nebulae" type="checkbox" role="switch" checked></label><label><span>仙女座与三角座星系</span><input id="sw-galaxies" type="checkbox" role="switch" checked></label><label><span>月球与月相</span><input id="sw-moon" type="checkbox" role="switch" checked></label></div>
         <div class="sw-control"><label for="sw-nebula-brightness">星云亮度 <output id="sw-nebula-bright-value">140%</output></label><input id="sw-nebula-brightness" aria-label="星云亮度" type="range" min="0" max="250" step="10" value="140"></div>
         <div class="sw-control"><label for="sw-nebula-size">星云显示尺寸 <output id="sw-nebula-size-value">2.5×</output></label><input id="sw-nebula-size" aria-label="星云显示尺寸" type="range" min="100" max="400" step="10" value="250"></div>
+        <div class="sw-control"><label for="sw-galaxy-brightness">河外星系亮度 <output id="sw-galaxy-bright-value">180%</output></label><input id="sw-galaxy-brightness" aria-label="河外星系亮度" type="range" min="0" max="300" step="10" value="180"></div>
+        <div class="sw-control"><label for="sw-galaxy-size">河外星系尺寸 <output id="sw-galaxy-size-value">2.0×</output></label><input id="sw-galaxy-size" aria-label="河外星系尺寸" type="range" min="100" max="400" step="10" value="200"></div>
         <div class="sw-control"><label for="sw-moon-size">月球显示尺寸 <output id="sw-moon-value">8×</output></label><input id="sw-moon-size" aria-label="月球显示尺寸" type="range" min="1" max="12" step="1" value="8"><div class="sw-range-labels"><span>1× · 真实角直径</span><span>艺术放大</span></div></div>
         <div class="sw-moon-status" aria-live="polite"></div>
         <div class="sw-celestial-actions"><button type="button" class="sw-now sw-focus-moon cursor-interaction">朝向月球</button><button type="button" class="sw-now sw-night-example cursor-interaction">夜景示例</button></div>
+      </details>
+      <details class="sw-celestial-settings"><summary class="cursor-interaction">流星雨与黄道光</summary>
+        <div class="sw-switches"><label><span>流星与流星雨</span><input id="sw-meteors" type="checkbox" role="switch" checked></label><label><span>黄道光</span><input id="sw-zodiacal" type="checkbox" role="switch"></label></div>
+        <div class="sw-control"><label for="sw-meteor-density">流星效果密度 <output id="sw-meteor-density-value">100%</output></label><input id="sw-meteor-density" aria-label="流星效果密度" type="range" min="0" max="300" step="10" value="100"></div>
+        <div class="sw-control"><label for="sw-zodiacal-brightness">黄道光亮度 <output id="sw-zodiacal-value">100%</output></label><input id="sw-zodiacal-brightness" aria-label="黄道光亮度" type="range" min="0" max="200" step="10" value="100"></div>
+        <div class="sw-moon-status sw-meteor-status" aria-live="polite"></div>
+        <p class="sw-annotation-note">流星数量随 IMO 活动期、峰值和辐射点改变；明亮大流星较少。动画为加速演示。黄道光仅在晨昏、太阳位于地平线下时显示。</p>
       </details>
       <div class="sw-divider"></div>
       <div class="sw-row-label"><label for="sw-city">观测位置</label><span class="sw-location-kind">手动预设</span></div>
@@ -60,7 +69,7 @@
       <div class="sw-timezone-label">当地时间 · <span class="sw-zone-label">Asia/Hong_Kong</span></div>
       <details class="sw-advanced"><summary class="cursor-interaction">位置与时区 <i data-lucide="sliders-horizontal" aria-hidden="true"></i></summary><div class="sw-coordinate-inputs"><label>纬度 °<input id="sw-lat" aria-label="纬度" type="number" min="-90" max="90" step="0.001" value="22.319"></label><label>经度 °<input id="sw-lon" aria-label="经度" type="number" min="-180" max="180" step="0.001" value="114.169"></label></div><label class="sw-zone-control">当地时区<select id="sw-zone" aria-label="当地时区"><option>Asia/Hong_Kong</option><option>Asia/Shanghai</option><option>Australia/Sydney</option><option>America/Santiago</option><option>Atlantic/Reykjavik</option><option>UTC</option></select></label></details>
       <div class="sw-error" role="alert" hidden></div>
-      <details class="sw-data-note"><summary class="cursor-interaction">星图数据与预览说明</summary><div>HYG v4.1 · 115,570 颗真实恒星。星等控制显示上限，星表在暗星端并不完备。银河按真实银道定位，光晕与暗云为程序化艺术增强。预览不模拟日光、月光照亮天空和城市光污染。</div><div>12 处星云按 OpenNGC 真实坐标定位，色彩、纹理为艺术表现；尺寸可设为 1×。月球采用 Astronomy Engine 2.1.19 离线计算观测位置、月相及天平动，表面来自 NASA LROC 月面图；显示尺寸可放大，地平线下不显示。</div><div>预览展示壁纸内绘制时钟，未模拟系统锁屏时钟。普通壁纸 App 无法隐藏系统时钟，正式版需提供兼容布局，并按机型验证。</div><div>数据：David Nash / HYG、Mattia Verga / OpenNGC，CC BY-SA 4.0；Don Cross / Astronomy Engine，MIT；NASA SVS / Ernie Wright、LROC / LOLA 月球纹理。</div></details>
+      <details class="sw-data-note"><summary class="cursor-interaction">星图数据与预览说明</summary><div>HYG v4.1 · 115,570 颗真实恒星。星等控制显示上限，星表在暗星端并不完备。银河按真实银道定位，光晕与暗云为程序化艺术增强。预览不模拟日光、月光照亮天空和城市光污染。</div><div>12 处星云和 M31、M33 按 OpenNGC 真实坐标定位，色彩、纹理为艺术表现；尺寸可设为 1×。月球采用 Astronomy Engine 2.1.19 离线计算观测位置、月相及天平动，表面来自 NASA LROC 月面图。</div><div>流星雨活动期、峰值、辐射点、ZHR 和亮度分布参考 IMO 2026 年历；跨年使用太阳黄经近似，实际峰值和观测数量会逐年变化。黄道光是沿黄道的程序化晨昏光晕。两者均为视觉效果。</div><div>预览展示壁纸内绘制时钟，未模拟系统锁屏时钟。普通壁纸 App 无法隐藏系统时钟，正式版需提供兼容布局，并按机型验证。</div><div>数据：David Nash / HYG、Mattia Verga / OpenNGC，CC BY-SA 4.0；IMO 流星雨年历；Don Cross / Astronomy Engine，MIT；NASA SVS / Ernie Wright、LROC / LOLA 月球纹理。</div></details>
     </section>
   </div>
 </div>
@@ -167,5 +176,7 @@
 <!-- CATALOGUE -->
 <!-- CONSTELLATIONS -->
 <!-- CELESTIAL_DATA -->
+<!-- EVENTS_DATA -->
+<!-- EVENTS_MATH -->
 <!-- CELESTIAL_MATH -->
 <!-- PREVIEW_SCRIPT -->
