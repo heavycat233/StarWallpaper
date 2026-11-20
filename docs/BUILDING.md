@@ -37,7 +37,7 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 先安装主 APK 和 QA APK。仅在可清理的测试设备/模拟器运行，夹具会更改并恢复测试偏好；不要在日常设备运行历史夹具。
 
 ```powershell
-.toolchains/sdk/platform-tools/adb.exe install -r dist/starwallpaper-1.2.6-android17.apk
+.toolchains/sdk/platform-tools/adb.exe install -r dist/starwallpaper-1.2.7-android17.apk
 .toolchains/sdk/platform-tools/adb.exe install -r build/android/qa/starfield-qa.apk
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.CelestialInstrumentation
 .toolchains/sdk/platform-tools/adb.exe shell am instrument -w app.starfield.wallpaper.test/.AnnotationInstrumentation
@@ -45,7 +45,7 @@ Node.js 20+，Python 3.11+；上述检查无第三方包依赖。数学测试覆
 
 `AnnotationInstrumentation` 验证亮星名称与星座开关在精简版可用、自动切换标准版，以及星名、星座和闪烁强度带来实际 GLES 像素变化。`CelestialInstrumentation` 验证两套数据库、扩展星表开关的像素变化、预览参数、GLES 帧、月球和星云像素、亮星面积、指针模式、地平线下月球隐藏。其他夹具记录初期版本的设置或系统集成场景；`BrightnessInstrumentation` 和 `UpgradeSeedInstrumentation` 是早期升级夹具，预设不适用于当前版本。`SmokeInstrumentation` 的旧大星表断言也不作为本版回归入口。
 
-Android 16 安装包可使用 `python tools/bootstrap_emulator16.py` 准备官方 API 36 模拟器；系统镜像约 844 MB，测试环境须另有足够空间。安装 `dist/starwallpaper-1.2.6-android16.apk` 和 `build/android16/qa/starfield-qa.apk` 后，运行同一组 `AnnotationInstrumentation` 与 `CelestialInstrumentation`。Android 17 模拟器准备脚本仍为 `tools/bootstrap_emulator.py`。
+Android 16 安装包可使用 `python tools/bootstrap_emulator16.py` 准备官方 API 36 模拟器；系统镜像约 844 MB，测试环境须另有足够空间。安装 `dist/starwallpaper-1.2.7-android16.apk` 和 `build/android16/qa/starfield-qa.apk` 后，运行同一组 `AnnotationInstrumentation` 与 `CelestialInstrumentation`。Android 17 模拟器准备脚本仍为 `tools/bootstrap_emulator.py`。
 
 ## 预览
 
@@ -56,7 +56,7 @@ python tools/serve_preview.py
 
 脚本只监听 `127.0.0.1`，使用支持 Canvas 与 DecompressionStream 的现代浏览器。Ctrl+C 结束服务。片段作为独立浏览器预览时不使用 Codex 的会话偏好保存；调整仍会立即改变画面。
 
-脚本同时提供 `/deep.html` 深星表对照页；也可直接打开 `preview/star-wallpaper-deep.html`。对照页额外加载约 5.3 MB 的 `preview/deep-catalog.js`，合并后的 11 等以内星表约 94 万颗。切换“星表对照”即可在同一画面比较。Android 1.2.6 使用相同星表记录与独立 GLES 暗星图层；模拟器已验证像素变化，厂商真机的帧率与耗电仍需测量。
+脚本同时提供 `/deep.html` 深星表对照页；也可直接打开 `preview/star-wallpaper-deep.html`。对照页额外加载约 5.3 MB 的 `preview/deep-catalog.js`，合并后的 11 等以内星表约 94 万颗。切换“星表对照”即可在同一画面比较。Android 1.2.7 使用相同星表记录与独立 GLES 暗星图层；模拟器已验证像素变化，厂商真机的帧率与耗电仍需测量。
 
 ## 重新生成天文数据（可选）
 
@@ -68,7 +68,7 @@ python tools/serve_preview.py
 | 从原始 HYG CSV 重新量化 | `python tools/prepare_catalog.py`；需从 NOTICE 的 HYG 来源另取 v4.1 CSV，放在 `data/hygdata_v41.csv`。原始大 CSV 不纳入仓库。 |
 | 重建深星表网页预览 | `python tools/download_deep_catalog.py` 下载 AT-HYG v3.2 两份原始 CSV（合计约 199 MB）；`python tools/build_deep_catalog.py` 生成 `preview/deep-catalog.js` 与元数据；再执行 `python tools/build_preview.py`。原始大 CSV 不纳入仓库。 |
 | 将深星表预览复制到 Android | `python tools/prepare_android_deep_catalog.py`；从已附的 `preview/deep-catalog.js` 生成 `stars-deep.bin.gz` 与 `deep-catalogue.json`，不需要重新下载。 |
-| 重建星云与月面派生数据 | `python tools/prepare_celestials.py`，再 `python tools/prepare_android_celestials.py`；需要 Pillow，输入为已附 OpenNGC CSV 与 NASA 月面图。 |
+| 重建星云与月面派生数据 | `python tools/prepare_celestials.py`，再 `python tools/prepare_android_celestials.py`；需要 Pillow，输入为已附 OpenNGC CSV、`data/halpha-nebula-sprites.json` 与 NASA 月面图。若要重新从 NASA SkyView 下载 Hα 裁图，先运行 `python tools/prepare_halpha_nebulae.py`；原始 FITS 缓存不纳入仓库。 |
 | 重建 1900–2101 月球星历 | `node tools/prepare_moon.cjs`；使用已附 Astronomy Engine 2.1.19，无 npm 安装。 |
 | 重建星座连线与名称 | `python tools/build_constellations.py`；输入为已附的 d3-celestial 原始 GeoJSON，输出 Android 与预览共享的 J2000 坐标。 |
 
@@ -81,4 +81,4 @@ python tools/verify_open_source.py
 python tools/package_open_source.py
 ```
 
-只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/starwallpaper-open-source-1.2.6.zip` 可以直接解压后构建。
+只按明确清单打包代码、文档、许可证和必要数据。`.git/`、`.signing/`、`.toolchains/`、设备导出、原始大 HYG/AT-HYG 和旧 APK 均排除。`dist/starwallpaper-open-source-1.2.7.zip` 可以直接解压后构建。

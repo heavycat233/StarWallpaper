@@ -255,11 +255,11 @@
       if(state.nebulae&&state.nebulaBrightness>0)celestialData.nebulae.forEach((nebula,index)=>{
         const ray=M.equatorial(nebula.ra,nebula.dec),p=C.project(ray,camera);
         if(!p||p[2]<0)return;
-        const {east,north}=C.basis(ray),pa=nebula.pa*M.D;
+        const {east,north}=C.basis(ray),span=nebula.textureArcmin||0,pa=span?0:nebula.pa*M.D;
         const major=north.map((v,i)=>v*Math.cos(pa)+east[i]*Math.sin(pa));
         const minor=east.map((v,i)=>v*Math.cos(pa)-north[i]*Math.sin(pa));
         const factor=state.nebulaSize/100*M.D/120;
-        const q=C.project(C.offset(ray,major,nebula.major*factor),camera),r=C.project(C.offset(ray,minor,nebula.minor*factor),camera);
+        const q=C.project(C.offset(ray,major,(span||nebula.major)*factor),camera),r=C.project(C.offset(ray,minor,(span||nebula.minor)*factor),camera);
         if(!q||!r)return;
         const ax=q[0]-p[0],ay=q[1]-p[1],bx=r[0]-p[0],by=r[1]-p[1],extent=Math.hypot(ax,ay)+Math.hypot(bx,by);
         if(p[0]+extent<0||p[0]-extent>width||p[1]+extent<0||p[1]-extent>height)return;
@@ -621,6 +621,13 @@
     const textureBytes=Uint8Array.from(atob(celestialData.moonTexture.data),c=>c.charCodeAt(0));
     moonTexture=new Uint8Array(await new Response(new Blob([textureBytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
     if(moonTexture.length!==celestialData.moonTexture.width*celestialData.moonTexture.height)throw new Error('月面纹理数据校验失败');
+    if(celestialData.nebulaSprites){
+      await Promise.all(Object.entries(celestialData.nebulaSprites).map(async ([id,encoded])=>{
+        const bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));
+        try{nebulaSprites.set(id,await createImageBitmap(new Blob([bytes],{type:'image/png'})));}
+        catch(problem){console.warn('星云纹理载入失败',id,problem);}
+      }));
+    }
     if(!restored?.celestialSceneVersion)nightExample();
     syncControls();rebuild(); frame = requestAnimationFrame(animate);
   } catch (e) { error(`真实星表未能载入：${e.message}`); $('.sw-render-status').textContent = '星表未载入'; }

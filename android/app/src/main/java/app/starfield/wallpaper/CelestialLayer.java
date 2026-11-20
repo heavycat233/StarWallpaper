@@ -48,8 +48,11 @@ public final class CelestialLayer {
   if((!s.nebulae||s.nebulaBrightness==0)&&(!s.galaxies||s.galaxyBrightness==0))return;
   if(s.nebulae&&s.nebulaBrightness>0)for(int i=0;i<clouds.length;i++)try{
    JSONObject n=nebulae.getJSONObject(i);double[] ray=SkyMath.equatorial(n.getDouble("ra"),n.getDouble("dec")),p=c.project(ray);if(p==null)continue;
-   double[] east=unit(new double[]{-ray[1],ray[0],0}),north=unit(cross(ray,east));double factor=s.nebulaSize/100.0*SkyMath.D/120;
-   double[] a=c.project(offset(ray,north,n.getDouble("major")*factor)),b=c.project(offset(ray,east,n.getDouble("minor")*factor));if(a==null||b==null)continue;
+   double[] east=unit(new double[]{-ray[1],ray[0],0}),north=unit(cross(ray,east));double span=n.optDouble("textureArcmin",0),pa=(span>0?0:n.optDouble("pa",0))*SkyMath.D;
+   double[] major={north[0]*Math.cos(pa)+east[0]*Math.sin(pa),north[1]*Math.cos(pa)+east[1]*Math.sin(pa),north[2]*Math.cos(pa)+east[2]*Math.sin(pa)};
+   double[] minor={east[0]*Math.cos(pa)-north[0]*Math.sin(pa),east[1]*Math.cos(pa)-north[1]*Math.sin(pa),east[2]*Math.cos(pa)-north[2]*Math.sin(pa)};
+   double factor=s.nebulaSize/100.0*SkyMath.D/120;
+   double[] a=c.project(offset(ray,major,(span>0?span:n.getDouble("major"))*factor)),b=c.project(offset(ray,minor,(span>0?span:n.getDouble("minor"))*factor));if(a==null||b==null)continue;
    Matrix matrix=new Matrix();matrix.setValues(new float[]{(float)((b[0]-p[0])/64),(float)((a[0]-p[0])/64),(float)(p[0]-(b[0]-p[0])-(a[0]-p[0])),(float)((b[1]-p[1])/64),(float)((a[1]-p[1])/64),(float)(p[1]-(b[1]-p[1])-(a[1]-p[1])),0,0,1});
    paint.setBlendMode(BlendMode.SCREEN);double strength=s.nebulaBrightness/100.0;for(int pass=0;pass<Math.ceil(strength);pass++){paint.setAlpha((int)(255*Math.min(1,strength-pass)));canvas.drawBitmap(clouds[i],matrix,paint);}paint.setBlendMode(null);paint.setAlpha(255);
   }catch(JSONException ignored){}

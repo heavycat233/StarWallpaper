@@ -60,6 +60,22 @@ for code,name,lon,dec,paths in figures:
     for path in paths:
         for ra,latitude in path:assert -180<=ra<=180 and -90<=latitude<=90
 print('PASS Android and preview use the same 88 constellation figures, names and J2000 lines.')
+celestials=json.loads((ROOT/'data/celestials.json').read_text(encoding='utf-8'))
+nebulae=celestials['nebulae']
+native_nebulae=json.loads((ASSETS/'nebulae.json').read_text(encoding='utf-8'))
+assert nebulae==native_nebulae and len(nebulae)==24
+sprites=celestials['nebulaSprites']
+assert len(sprites)==21 and set(sprites)<={item['id'] for item in nebulae}
+for item in nebulae:
+    asset=(ASSETS/(item['id']+'.png')).read_bytes()
+    assert asset[:16]==b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR'
+    assert struct.unpack('>II',asset[16:24])==(128,128)
+    if item['id'] in sprites:
+        assert asset==base64.b64decode(sprites[item['id']],validate=True)
+        assert item['textureArcmin']>0
+    else:
+        assert 'textureArcmin' not in item
+print('PASS Android and preview share 24 nebula coordinates and all 21 survey sprite PNG bytes.')
 root=ET.parse(ROOT/'android/app/src/main/AndroidManifest.xml').getroot()
 attr='{http://schemas.android.com/apk/res/android}'
 assert root.find('uses-sdk').attrib[attr+'minSdkVersion']=='37'
