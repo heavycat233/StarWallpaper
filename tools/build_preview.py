@@ -1,4 +1,4 @@
-"""Build the self-contained inline preview from editable sources."""
+"""Build the self-contained, under-1MB inline preview from editable sources."""
 import json
 import base64
 import gzip
@@ -25,9 +25,9 @@ fragment = fragment.replace('<!-- CELESTIAL_MATH -->','<script>\n'+(ROOT/'previe
 fragment = fragment.replace('<!-- PREVIEW_SCRIPT -->', '<script>\n' + (ROOT / 'preview/preview.js').read_text(encoding='utf-8') + '\n</script>')
 out = ROOT / 'preview/star-wallpaper.html'
 out.write_text(fragment.replace('<!-- DEEP_DATA -->',''), encoding='utf-8')
-assert out.stat().st_size < 2_000_000, out.stat().st_size
+assert out.stat().st_size < 1_000_000, out.stat().st_size
 print(f'Built {out} ({out.stat().st_size:,} bytes)')
 deep = ROOT / 'preview/star-wallpaper-deep.html'
 deep.write_text(fragment.replace('<!-- DEEP_DATA -->','<script>window.STAR_DEEP_PREVIEW=true;</script><script src="deep-catalog.js"></script>'), encoding='utf-8')
-assert deep.stat().st_size < 2_000_000, deep.stat().st_size
+assert deep.stat().st_size < 1_000_000, deep.stat().st_size
 print(f'Built {deep} ({deep.stat().st_size:,} bytes; external AT-HYG supplement)')

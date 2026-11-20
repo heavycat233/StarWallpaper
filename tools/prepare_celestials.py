@@ -20,18 +20,6 @@ selected={
  'IC1848':('灵魂星云',[147,70,109],1.0),
  'NGC6960':('西面纱星云',[85,138,162],.8),
  'NGC6992':('东面纱星云',[96,133,170],.9),
- 'NGC0281':('吃豆人星云',[160,69,103],1.0),
- 'NGC1952':('蟹状星云 M1',[126,111,159],1.15),
- 'NGC1977':('奔跑人星云',[101,129,175],1.0),
- 'NGC2024':('火焰星云',[180,82,89],1.15),
- 'NGC2174':('猴头星云',[159,73,114],1.0),
- 'NGC2359':('雷神头盔星云',[118,132,176],1.0),
- 'NGC6611':('鹰状星云 M16',[172,84,107],1.1),
- 'NGC6618':('欧米茄星云 M17',[179,83,105],1.15),
- 'NGC6888':('新月星云',[121,137,171],1.0),
- 'NGC7293':('螺旋星云',[120,144,166],1.05),
- 'NGC7635':('气泡星云',[151,98,153],1.05),
- 'IC5146':('茧星云',[158,87,123],1.0),
 }
 def angle(text,ra=False):
     sign=-1 if text.startswith('-') else 1
@@ -49,13 +37,5 @@ assert len(nebulae)==len(selected)
 moon=Image.open(ROOT/'data/moon-lroc-2k.jpg').convert('L').resize((256,128),Image.Resampling.LANCZOS)
 texture=base64.b64encode(gzip.compress(moon.tobytes(),9,mtime=0)).decode('ascii')
 data={'nebulae':nebulae,'moonTexture':{'width':256,'height':128,'data':texture},'nebulaSource':'Mattia Verga / OpenNGC, CC BY-SA 4.0; selected coordinates and angular extents; artistic colors and procedural structure','moonTextureSource':'NASA SVS CGI Moon Kit / LROC WAC, grayscale downsample of lroc_color_2k.jpg, https://svs.gsfc.nasa.gov/4720/'}
-atlas_path=ROOT/'data/halpha-nebula-sprites.json'
-if atlas_path.is_file():
-    atlas=json.loads(atlas_path.read_text(encoding='utf-8'))
-    assert set(atlas['sprites'])<={item['id'] for item in nebulae}
-    data['nebulaSprites']={key:value['png'] for key,value in atlas['sprites'].items()}
-    for item in nebulae:
-        if item['id'] in atlas['sprites']:item['textureArcmin']=atlas['sprites'][item['id']]['sizeArcmin']
-    data['nebulaSource']='Mattia Verga / OpenNGC, CC BY-SA 4.0; H-alpha sprite structure from Douglas Finkbeiner full-sky H-alpha composite via NASA SkyView; false color and opacity processing'
 (ROOT/'data/celestials.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
 print(f'Prepared {len(nebulae)} real nebula positions and {len(texture):,} bytes of lunar albedo.')

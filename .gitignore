@@ -27,7 +27,6 @@ Thumbs.db
 /data/athyg_*.csv.gz
 /data/ATHYG-*.md
 /data/ATHYG-LICENSE.txt
-/data/halpha-raw/
 /vendor/astronomy/package.tgz
 /vendor/astronomy/npm-metadata.json
 /vendor/astronomy/astronomy.js

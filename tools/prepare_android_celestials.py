@@ -18,11 +18,7 @@ def noise(x,y,z):
     mix=lambda a,b,t:a+(b-a)*t
     return mix(mix(mix(hash3(ix,iy,iz),hash3(ix+1,iy,iz),fx),mix(hash3(ix,iy+1,iz),hash3(ix+1,iy+1,iz),fx),fy),mix(mix(hash3(ix,iy,iz+1),hash3(ix+1,iy,iz+1),fx),mix(hash3(ix,iy+1,iz+1),hash3(ix+1,iy+1,iz+1),fx),fy),fz)
 
-sprites=data.get('nebulaSprites',{})
 for idx,n in enumerate(data['nebulae']):
-    if n['id'] in sprites:
-        (OUT/(n['id']+'.png')).write_bytes(base64.b64decode(sprites[n['id']],validate=True))
-        continue
     img=Image.new('RGBA',(128,128));p=img.load()
     for y in range(128):
         for x in range(128):
@@ -35,4 +31,4 @@ for idx,n in enumerate(data['nebulae']):
     img.save(OUT/(n['id']+'.png'))
 shutil.copyfile(ROOT/'data/OpenNGC-LICENSE.txt',OUT/'OpenNGC-LICENSE.txt')
 license=(ROOT/'vendor/astronomy/astronomy.browser.min.js').read_text(encoding='utf-8').split('*/',1)[0]+'*/'
-(OUT/'CELESTIAL-LICENSE.txt').write_text('Moon ephemeris derived from Astronomy Engine 2.1.19, Don Cross. MIT.\n'+license+'\nNebula and M31/M33 galaxy positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. H-alpha nebula sprite structure: Douglas P. Finkbeiner full-sky composite v1.1 via NASA SkyView; false-color and opacity processing. Remaining nebula textures and galaxy shapes are procedural artistic textures.\nMeteor shower timing/radiants/rates/population indices: International Meteor Organization 2026 Meteor Shower Calendar, https://www.imo.net/files/meteor-shower/cal2026.pdf . Statistical decorative animation, not an observation forecast.\nMoon map: NASA SVS CGI Moon Kit https://svs.gsfc.nasa.gov/4720/ Ernie Wright / LROC / LOLA. Resampled grayscale.\nEphemeris: 1900-2101, six-hour J2000 samples with linear interpolation; visual use only.\n',encoding='utf-8')
+(OUT/'CELESTIAL-LICENSE.txt').write_text('Moon ephemeris derived from Astronomy Engine 2.1.19, Don Cross. MIT.\n'+license+'\nNebula and M31/M33 galaxy positions/sizes: Mattia Verga / OpenNGC, CC BY-SA 4.0. Procedural artistic textures.\nMeteor shower timing/radiants/rates/population indices: International Meteor Organization 2026 Meteor Shower Calendar, https://www.imo.net/files/meteor-shower/cal2026.pdf . Statistical decorative animation, not an observation forecast.\nMoon map: NASA SVS CGI Moon Kit https://svs.gsfc.nasa.gov/4720/ Ernie Wright / LROC / LOLA. Resampled grayscale.\nEphemeris: 1900-2101, six-hour J2000 samples with linear interpolation; visual use only.\n',encoding='utf-8')
