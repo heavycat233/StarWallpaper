@@ -5,7 +5,7 @@
 | 内容 | 来源与作者 | 许可与修改 |
 | --- | --- | --- |
 | HYG v4.1 恒星数据库 | David Nash / Astronomy Nexus，[HYG Database](https://github.com/astronexus/HYG-Database) | CC BY-SA 4.0。选取 V≤11、排除太阳，坐标/星等/色指数经量化、排序、gzip 压缩，115,570 条；这些派生数据仍按 CC BY-SA 4.0 提供。见 `LICENSES/CC-BY-SA-4.0.txt`、`data/HYG-LICENSE.txt`。 |
-| AT-HYG v3.2 深星表预览 | David Nash / Astronomy Nexus 与贡献者，[AT-HYG Database](https://github.com/astronexus/ATHYG-Database) | CC BY-SA 4.0。从两份 v3.2 CSV 中筛选无 HYG 交叉编号、近似 Johnson V≤11 的恒星；对 Tycho VT 与 BT−VT 按 ESA 转换公式换算，随后量化、按星等排序、分字节压缩，得 822,917 条。派生文件 `preview/deep-catalog.js` 及 `data/athyg-preview-meta.json` 仍按 CC BY-SA 4.0 提供。见 `LICENSES/CC-BY-SA-4.0.txt`。原始大 CSV 不纳入仓库。 |
+| AT-HYG v3.2 深星表 | David Nash / Astronomy Nexus 与贡献者，[AT-HYG Database](https://github.com/astronexus/ATHYG-Database) | CC BY-SA 4.0。从两份 v3.2 CSV 中筛选无 HYG 交叉编号、近似 Johnson V≤11 的恒星；对 Tycho VT 与 BT−VT 按 ESA 转换公式换算，随后量化、按星等排序、分字节压缩，得 822,917 条。派生文件 `preview/deep-catalog.js`、`data/athyg-preview-meta.json`、Android 的 `stars-deep.bin.gz` 与 `deep-catalogue.json` 仍按 CC BY-SA 4.0 提供。见 `LICENSES/CC-BY-SA-4.0.txt`、`android/app/src/main/assets/ATHYG-LICENSE.txt`。原始大 CSV 不纳入仓库。 |
 | OpenNGC 星云与河外星系目录 | Mattia Verga 与 OpenNGC contributors，[OpenNGC](https://github.com/mattiaverga/OpenNGC) | CC BY-SA 4.0。选取 12 处星云/遗迹，以及 M31、M33 的坐标与角尺寸；派生子集继续使用同一许可。见 `data/OpenNGC-LICENSE.txt`。纹理由本项目程序生成。 |
 | 流星雨年度参考资料 | [International Meteor Organization，2026 Meteor Shower Calendar](https://www.imo.net/files/meteor-shower/cal2026.pdf) | Table 5 的活动期、太阳黄经峰值、辐射点、ZHR 和亮度指数整理为 `data/meteor-showers.json`，来源与视觉加速限制均写入数据文件；按 IMO 原文条件及许可引用。 |
 | 星座连线和名称 | Olaf Frohn，[d3-celestial](https://github.com/ofrohn/d3-celestial) | BSD 3-Clause。以 J2000 GeoJSON 的 88 个星座、89 组连线转换为供 Android 和预览共用的紧凑坐标数据，保留原始文件及 `LICENSES/BSD-3-Clause-d3-celestial.txt`。连线是约定的示意图形，不是 IAU 星座边界。 |
@@ -16,4 +16,4 @@
 
 仓库中的手机效果图由本项目生成，属于界面/渲染示例；不代表恒星观测照片。它们含上述数据和素材，应保留本文件的归属信息。
 
-Android SDK、JDK、Gradle、Python/Pillow、Node.js、GitHub Actions 等属于构建环境，不随源码包分发，遵循各自供应方许可。AT-HYG 原始下载仅用于重建深星表网页预览，不是当前 Android APK 的构建依赖，也不包含在发布包中。
+Android SDK、JDK、Gradle、Python/Pillow、Node.js、GitHub Actions 等属于构建环境，不随源码包分发，遵循各自供应方许可。AT-HYG 原始下载仅用于重建深星表派生数据；普通 Android 构建直接使用已附资产，不包含原始大 CSV。

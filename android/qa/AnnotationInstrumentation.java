@@ -65,7 +65,7 @@ public final class AnnotationInstrumentation extends Instrumentation {
         Bundle result=new Bundle();Settings settings=new Settings(getTargetContext());SharedPreferences prefs=settings.prefs;Map<String,?> original=new HashMap<>(prefs.getAll());Activity activity=null;
         try{
             android.content.pm.PackageManager packageManager=getTargetContext().getPackageManager();
-            check(packageManager.getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==6,"Version code 6 installed");
+            check(packageManager.getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==9,"Version code 9 installed");
             check("starwallpaper".contentEquals(packageManager.getApplicationLabel(getTargetContext().getApplicationInfo())),"Launcher application label is starwallpaper");
             check("starwallpaper".contentEquals(packageManager.getServiceInfo(new ComponentName(getTargetContext(),StarWallpaperService.class),0).loadLabel(packageManager)),"Live wallpaper label is starwallpaper");
             long epoch=java.time.Instant.parse("2026-10-28T17:30:00Z").toEpochMilli();double[] sir=SkyMath.equatorial(6.752481,-16.716116);double[] horizontal=null;

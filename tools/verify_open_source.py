@@ -17,6 +17,8 @@ def verify():
     catalogue=gzip.decompress(base64.b64decode((ROOT/'data/catalogue.b64').read_text(encoding='ascii')))
     assert catalogue==gzip.decompress((ROOT/'android/app/src/main/assets/stars.bin.gz').read_bytes())
     assert len(catalogue)==115570*6
+    deep=(ROOT/'android/app/src/main/assets/stars-deep.bin.gz').read_bytes()
+    assert len(gzip.decompress(deep))==822917*6
     assert 'MIT License' in (ROOT/'LICENSE').read_text(encoding='utf-8')
     for name in ['CC-BY-SA-4.0.txt','MIT-Astronomy-Engine.txt']:
         assert (ROOT/'LICENSES'/name).stat().st_size>500

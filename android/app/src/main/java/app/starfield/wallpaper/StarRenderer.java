@@ -33,9 +33,10 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     public volatile boolean allowClock=true;
     public volatile int renderedFrames=0;
     private Settings.Snapshot scene;
-    private int seenVersion=-1,width=1,height=1,quadVao,starVao,quadVbo,starVbo,galaxyProgram,starsProgram,textureProgram,galaxyTexture,overlayTexture,framebuffer;
+    private int seenVersion=-1,width=1,height=1,quadVao,starVao,deepStarVao,quadVbo,starVbo,deepStarVbo,galaxyProgram,starsProgram,deepStarsProgram,textureProgram,galaxyTexture,overlayTexture,framebuffer;
     private int galaxyW,galaxyH;
     private StarCatalog catalog;
+    private DeepStarCatalog deepCatalog;
     private ConstellationOverlay constellations;
     private CelestialLayer celestial;private MeteorLayer meteors;private int cloudTexture,meteorTexture;private Bitmap cloudOverlay,meteorOverlay;
     private long galaxyTime=Long.MIN_VALUE,overlayTime=Long.MIN_VALUE;
@@ -51,9 +52,9 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
     @Override public void onSurfaceCreated(GL10 ignored,EGLConfig config){
         error=null;uniformCache.clear();galaxyTime=Long.MIN_VALUE;overlayTime=Long.MIN_VALUE;seenVersion=-1;
         try{
-            catalog=StarCatalog.get(context);celestial=new CelestialLayer(context);meteors=new MeteorLayer(context);constellations=new ConstellationOverlay(context);
-            int[] vaos=new int[2],buffers=new int[2],textures=new int[4],fbos=new int[1];
-            GLES30.glGenVertexArrays(2,vaos,0);quadVao=vaos[0];starVao=vaos[1];GLES30.glGenBuffers(2,buffers,0);quadVbo=buffers[0];starVbo=buffers[1];
+            catalog=StarCatalog.get(context);deepCatalog=DeepStarCatalog.get(context);celestial=new CelestialLayer(context);meteors=new MeteorLayer(context);constellations=new ConstellationOverlay(context);
+            int[] vaos=new int[3],buffers=new int[3],textures=new int[4],fbos=new int[1];
+            GLES30.glGenVertexArrays(3,vaos,0);quadVao=vaos[0];starVao=vaos[1];deepStarVao=vaos[2];GLES30.glGenBuffers(3,buffers,0);quadVbo=buffers[0];starVbo=buffers[1];deepStarVbo=buffers[2];
             FloatBuffer quad=ByteBuffer.allocateDirect(8*4).order(ByteOrder.nativeOrder()).asFloatBuffer();quad.put(new float[]{-1,-1,1,-1,-1,1,1,1}).position(0);
             GLES30.glBindVertexArray(quadVao);GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER,quadVbo);GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,32,quad,GLES30.GL_STATIC_DRAW);GLES30.glEnableVertexAttribArray(0);GLES30.glVertexAttribPointer(0,2,GLES30.GL_FLOAT,false,8,0);
             GLES30.glBindVertexArray(starVao);GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER,starVbo);
@@ -61,7 +62,12 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
             GLES30.glEnableVertexAttribArray(0);GLES30.glVertexAttribPointer(0,3,GLES30.GL_FLOAT,false,20,0);
             GLES30.glEnableVertexAttribArray(1);GLES30.glVertexAttribPointer(1,1,GLES30.GL_FLOAT,false,20,12);
             GLES30.glEnableVertexAttribArray(2);GLES30.glVertexAttribPointer(2,1,GLES30.GL_FLOAT,false,20,16);
-            galaxyProgram=program("shaders/quad.vert","shaders/galaxy.frag");starsProgram=program("shaders/stars.vert","shaders/stars.frag");textureProgram=program("shaders/quad.vert","shaders/texture.frag");
+            GLES30.glBindVertexArray(deepStarVao);GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER,deepStarVbo);
+            FloatBuffer deepStars=deepCatalog.vertices.duplicate();deepStars.position(0);GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,deepCatalog.count*20,deepStars,GLES30.GL_STATIC_DRAW);
+            GLES30.glEnableVertexAttribArray(0);GLES30.glVertexAttribPointer(0,3,GLES30.GL_FLOAT,false,20,0);
+            GLES30.glEnableVertexAttribArray(1);GLES30.glVertexAttribPointer(1,1,GLES30.GL_FLOAT,false,20,12);
+            GLES30.glEnableVertexAttribArray(2);GLES30.glVertexAttribPointer(2,1,GLES30.GL_FLOAT,false,20,16);
+            galaxyProgram=program("shaders/quad.vert","shaders/galaxy.frag");starsProgram=program("shaders/stars.vert","shaders/stars.frag");deepStarsProgram=program("shaders/deep-stars.vert","shaders/deep-stars.frag");textureProgram=program("shaders/quad.vert","shaders/texture.frag");
             GLES30.glGenTextures(4,textures,0);galaxyTexture=textures[0];overlayTexture=textures[1];cloudTexture=textures[2];meteorTexture=textures[3];
             for(int texture:textures){GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,texture);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);}
             GLES30.glGenFramebuffers(1,fbos,0);framebuffer=fbos[0];GLES30.glBindVertexArray(0);
@@ -88,6 +94,7 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
             Canvas clouds=new Canvas(cloudOverlay);clouds.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);celestial.drawClouds(clouds,SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,cloudOverlay.getWidth(),cloudOverlay.getHeight()),scene);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,cloudTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,cloudOverlay,0);
         }
         GLES30.glDisable(GLES30.GL_BLEND);texture(galaxyTexture,false);GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(cloudTexture,true);
+        if(scene.deepCatalog)drawDeepStars(camera);
         GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);GLES30.glUseProgram(starsProgram);cameraUniforms(starsProgram,camera);GLES30.glUniformMatrix3fv(uniform(starsProgram,"uLocal"),1,false,SkyMath.glMatrix(camera.local),0);GLES30.glUniform1f(uniform(starsProgram,"uTime"),(SystemClock.elapsedRealtime()%600000)/1000f);GLES30.glUniform1f(uniform(starsProgram,"uPixelScale"),Math.max(.85f,width/320f));GLES30.glUniform1f(uniform(starsProgram,"uFaintBrightness"),scene.faintBrightness/100f);GLES30.glUniform1f(uniform(starsProgram,"uBrightSize"),scene.brightSize/100f);GLES30.glUniform1f(uniform(starsProgram,"uTwinkleStrength"),scene.twinkleStrength/100f);GLES30.glUniform1i(uniform(starsProgram,"uTwinkle"),scene.twinkle?1:0);GLES30.glBindVertexArray(starVao);int total=catalog.counts[scene.magnitude],bright=Math.min(total,catalog.dynamicCount);if(total>bright)GLES30.glDrawArrays(GLES30.GL_POINTS,bright,total-bright);GLES30.glDrawArrays(GLES30.GL_POINTS,0,bright);
         if(scene.meteors&&scene.meteorDensity>0){Canvas motion=new Canvas(meteorOverlay);motion.drawColor(Color.TRANSPARENT,PorterDuff.Mode.CLEAR);SkyMath.Camera meteorCamera=SkyMath.camera(epoch,scene.lat,scene.lon,scene.azimuth,scene.altitude,scene.fov,meteorOverlay.getWidth(),meteorOverlay.getHeight());if(meteors.draw(motion,meteorCamera,scene,epoch,version)){GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,meteorTexture);GLUtils.texImage2D(GLES30.GL_TEXTURE_2D,0,meteorOverlay,0);GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(meteorTexture,true);}}
         long overlayBucket=epoch/(scene.clock.equals("analog")?1000:60000);
@@ -97,6 +104,14 @@ public final class StarRenderer implements GLSurfaceView.Renderer {
         GLES30.glBlendFunc(GLES30.GL_ONE,GLES30.GL_ONE_MINUS_SRC_ALPHA);texture(overlayTexture,true);GLES30.glDisable(GLES30.GL_BLEND);renderedFrames++;
     }
     private void texture(int texture,boolean flip){GLES30.glUseProgram(textureProgram);GLES30.glActiveTexture(GLES30.GL_TEXTURE0);GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,texture);GLES30.glUniform1i(uniform(textureProgram,"uTexture"),0);GLES30.glUniform1i(uniform(textureProgram,"uFlip"),flip?1:0);quad();}
+    private void drawDeepStars(SkyMath.Camera camera){
+        GLES30.glEnable(GLES30.GL_BLEND);GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE);
+        GLES30.glUseProgram(deepStarsProgram);cameraUniforms(deepStarsProgram,camera);
+        GLES30.glUniformMatrix3fv(uniform(deepStarsProgram,"uLocal"),1,false,SkyMath.glMatrix(camera.local),0);
+        GLES30.glUniform1f(uniform(deepStarsProgram,"uPixelScale"),Math.max(.85f,width/320f));
+        GLES30.glUniform1f(uniform(deepStarsProgram,"uFaintBrightness"),scene.faintBrightness/100f);
+        GLES30.glBindVertexArray(deepStarVao);GLES30.glDrawArrays(GLES30.GL_POINTS,0,deepCatalog.counts[scene.magnitude]);
+    }
     private void quad(){GLES30.glBindVertexArray(quadVao);GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP,0,4);}
     private void cameraUniforms(int program,SkyMath.Camera c){GLES30.glUniform2f(uniform(program,"uSize"),width,height);GLES30.glUniform1f(uniform(program,"uScale"),(float)c.scale);vector(program,"uRight",c.right);vector(program,"uUp",c.up);vector(program,"uCenter",c.center);}
     private void vector(int program,String name,double[] v){GLES30.glUniform3f(uniform(program,name),(float)v[0],(float)v[1],(float)v[2]);}

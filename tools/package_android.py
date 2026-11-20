@@ -22,7 +22,7 @@ with zipfile.ZipFile(out,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
         archive.write(source,'starwallpaper/'+relative)
 with zipfile.ZipFile(out) as archive:
     assert archive.testzip() is None
-report={'version':version,'applicationId':'app.starfield.wallpaper','minSdk':37,'targetSdk':37,'compileSdk':37,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':checksum,'catalogue':115570,'catalogueSource':'HYG v4.1, exact preview records','sourceArchive':out.name,'signing':'local RSA-3072 APK Signature Scheme v3','tested':'Android 17 / API 37 emulator; star-name and constellation controls; GLES pixel changes for names, lines and twinkle strength; exact Android/preview HYG and constellation data; native coordinate tests','notYetValidated':'OEM physical devices, AOD, long-duration battery measurements'}
+report={'version':version,'applicationId':'app.starfield.wallpaper','minSdk':37,'targetSdk':37,'compileSdk':37,'apk':apk.name,'bytes':apk.stat().st_size,'sha256':checksum,'catalogue':938487,'catalogueSource':'HYG v4.1 + AT-HYG v3.2, exact deep-preview records','sourceArchive':out.name,'signing':'local RSA-3072 APK Signature Scheme v3','tested':'Android 17 / API 37 emulator; deep-catalogue toggle, star-name and constellation controls; GLES pixel changes for deep stars, names, lines and twinkle strength; exact Android/preview data; native coordinate tests','notYetValidated':'OEM physical devices, AOD, long-duration battery measurements'}
 android16=DIST/f'starwallpaper-{version}-android16.apk'
 if android16.is_file():
     expected16=(DIST/'SHA256SUMS-android16.txt').read_text(encoding='ascii').split()[0]

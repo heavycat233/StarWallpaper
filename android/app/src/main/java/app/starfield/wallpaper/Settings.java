@@ -21,7 +21,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
     public static final class Snapshot {
         public final String clock,uiMode,place,zone;
         public final int magnitude,faintBrightness,fov,glow,dust,azimuth,altitude,clockTop,fps,brightSize,nebulaBrightness,nebulaSize,moonSize,twinkleStrength,galaxyBrightness,galaxySize,meteorDensity,zodiacalBrightness;
-        public final boolean nebulae,moon,galaxies,meteors,zodiacalLight;
+        public final boolean nebulae,moon,galaxies,meteors,zodiacalLight,deepCatalog;
         public final double lat,lon;
         public final boolean twinkle,labels,constellations,followLocation,systemTime,desktopClock;
         public final long fixedEpoch;
@@ -31,7 +31,7 @@ public final class Settings implements SharedPreferences.OnSharedPreferenceChang
             magnitude=bounded(p,"magnitude",9,3,11);faintBrightness=bounded(p,"faintBrightness",120,50,400);fov=bounded(p,"fov",180,120,180);glow=bounded(p,"glow",148,0,200);dust=bounded(p,"dust",50,0,150);
             brightSize=bounded(p,"brightSize",70,50,100);nebulaBrightness=bounded(p,"nebulaBrightness",140,0,250);nebulaSize=bounded(p,"nebulaSize",250,100,400);moonSize=bounded(p,"moonSize",8,1,12);nebulae=p.getBoolean("nebulae",true);moon=p.getBoolean("moon",true);
             galaxyBrightness=bounded(p,"galaxyBrightness",180,0,300);galaxySize=bounded(p,"galaxySize",200,100,400);meteorDensity=bounded(p,"meteorDensity",100,0,300);zodiacalBrightness=bounded(p,"zodiacalBrightness",100,0,200);
-            galaxies=p.getBoolean("galaxies",true);meteors=p.getBoolean("meteors",true);zodiacalLight=p.getBoolean("zodiacalLight",false);
+            galaxies=p.getBoolean("galaxies",true);meteors=p.getBoolean("meteors",true);zodiacalLight=p.getBoolean("zodiacalLight",false);deepCatalog=p.getBoolean("deepCatalog",true);
             azimuth=bounded(p,"azimuth",94,0,359);altitude=bounded(p,"altitude",79,0,90);clockTop=bounded(p,"clockTop",13,5,65);fps=bounded(p,"fps",20,5,30);twinkleStrength=bounded(p,"twinkleStrength",140,0,200);
             double la=Double.longBitsToDouble(p.getLong("lat",Double.doubleToLongBits(22.3193))),lo=Double.longBitsToDouble(p.getLong("lon",Double.doubleToLongBits(114.1694)));
             lat=Double.isFinite(la)?SkyMath.clamp(la,-90,90):22.3193;lon=Double.isFinite(lo)?SkyMath.clamp(lo,-180,180):114.1694;

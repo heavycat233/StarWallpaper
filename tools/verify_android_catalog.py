@@ -26,6 +26,30 @@ assert counts==meta['counts']
 assert records==gzip.decompress(base64.b64decode((ROOT/'data/catalogue.b64').read_text(encoding='ascii')))
 assert meta['count']==115570 and meta['source']=='HYG v4.1'
 print('PASS every native record equals the preview, including order and quantization.')
+deep_source=(ROOT/'preview/deep-catalog.js').read_text(encoding='ascii').strip()
+prefix='window.STAR_DEEP_CATALOGUE='
+assert deep_source.startswith(prefix) and deep_source.endswith(';')
+deep=json.loads(deep_source[len(prefix):-1])
+deep_meta=json.loads((ASSETS/'deep-catalogue.json').read_text(encoding='utf-8'))
+deep_blob=(ASSETS/'stars-deep.bin.gz').read_bytes()
+assert deep_blob==base64.b64decode(deep['data'],validate=True)
+assert hashlib.sha256(deep_blob).hexdigest()==deep_meta['sha256']
+planes=gzip.decompress(deep_blob)
+assert len(planes)==deep_meta['count']*6 and deep_meta['count']==deep['count']==822917
+assert hashlib.sha256(planes).hexdigest()==deep_meta['uncompressedSha256']
+deep_counts={str(m):0 for m in range(3,12)}
+count=deep_meta['count']
+previous=-float('inf')
+for i in range(count):
+    dec=struct.unpack('<h',bytes((planes[count*2+i],planes[count*3+i])))[0]
+    magnitude=planes[count*4+i]/16-2
+    assert -32767<=dec<=32767 and previous<=magnitude<=11
+    previous=magnitude
+    for cutoff in deep_counts:
+        if magnitude<=int(cutoff):deep_counts[cutoff]+=1
+assert deep_counts==deep_meta['counts']==deep['counts']
+assert meta['count']+deep_meta['count']==938487
+print('PASS Android AT-HYG supplement equals the deep preview byte-for-byte; 938,487 combined stars and all 3–11 cutoffs verified.')
 figures_bytes=(ROOT/'data/constellations.json').read_bytes()
 assert figures_bytes==(ASSETS/'constellations.json').read_bytes()
 figures=json.loads(figures_bytes)['figures']
@@ -42,5 +66,5 @@ assert root.find('uses-sdk').attrib[attr+'minSdkVersion']=='37'
 assert root.find('uses-sdk').attrib[attr+'targetSdkVersion']=='37'
 permissions={item.attrib[attr+'name'] for item in root.findall('uses-permission')}
 assert permissions=={'android.permission.ACCESS_COARSE_LOCATION','android.permission.ACCESS_FINE_LOCATION','android.permission.ACCESS_BACKGROUND_LOCATION'}
-print('PASS native catalogue: {:,} real records, SHA-256, coordinate ranges, ordered magnitudes and every 3–11 cutoff.'.format(meta['count']))
+print('PASS native catalogues: {:,} real records, SHA-256, coordinate ranges, ordered magnitudes and every 3–11 cutoff.'.format(meta['count']+deep_meta['count']))
 print('PASS manifest: API 37 minimum/target; only location permissions; no Internet permission.')

@@ -35,7 +35,7 @@ public final class CelestialInstrumentation extends Instrumentation {
     private void restore(SharedPreferences p,Map<String,?> values){SharedPreferences.Editor e=p.edit().clear();for(Map.Entry<String,?> item:values.entrySet()){Object v=item.getValue();String key=item.getKey();if(v instanceof String)e.putString(key,(String)v);else if(v instanceof Integer)e.putInt(key,(Integer)v);else if(v instanceof Long)e.putLong(key,(Long)v);else if(v instanceof Boolean)e.putBoolean(key,(Boolean)v);else if(v instanceof Float)e.putFloat(key,(Float)v);}e.commit();}
     private android.widget.Button findButton(android.view.View v){if(v instanceof android.widget.Button&&((android.widget.Button)v).getText().toString().equals("载入对话预览参数"))return (android.widget.Button)v;if(v instanceof android.view.ViewGroup){android.view.ViewGroup g=(android.view.ViewGroup)v;for(int i=0;i<g.getChildCount();i++){android.widget.Button b=findButton(g.getChildAt(i));if(b!=null)return b;}}return null;}
     @Override public void onStart(){Bundle result=new Bundle();Settings s=new Settings(getTargetContext());SharedPreferences p=s.prefs;Map<String,?> original=new HashMap<>(p.getAll());Activity preview=null;try{
-        check(getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==8,"Version code 8 installed");
+        check(getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0).getLongVersionCode()==9,"Version code 9 installed");
         Activity main=startActivitySync(new Intent(getTargetContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK));frames(sky(main));waitForIdleSync();
         runOnMainSync(()->{android.widget.Button button=findButton(main.getWindow().getDecorView());if(button==null)throw new AssertionError("Preview preset action exists");button.performClick();});waitForIdleSync();
         Settings.Snapshot matched=s.snapshot();check(matched.place.equals("香港")&&Math.abs(matched.lat-22.3193)<.00001&&matched.magnitude==9&&matched.fov==180&&matched.faintBrightness==120&&matched.brightSize==70&&matched.azimuth==94&&matched.altitude==79&&!matched.systemTime&&matched.fixedEpoch==java.time.Instant.parse("2026-10-28T17:30:00Z").toEpochMilli(),"One-tap action restores exact conversation date, location, view and brightness");runOnMainSync(main::finish);waitForIdleSync();
@@ -43,6 +43,12 @@ public final class CelestialInstrumentation extends Instrumentation {
         check(s.snapshot().faintBrightness==120&&s.snapshot().fov==180&&s.snapshot().brightSize==70,"New install defaults match selected preview");
         preview=startActivitySync(new Intent(getTargetContext(),PreviewActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK));SkyPreview view=sky(preview);
         check(app.starfield.wallpaper.StarCatalog.get(getTargetContext()).count==115570,"Exact preview HYG v4.1 catalogue loaded");
+        check(app.starfield.wallpaper.DeepStarCatalog.get(getTargetContext()).count==822917,"Exact preview AT-HYG supplement loaded");
+        runOnMainSync(()->p.edit().putInt("magnitude",11).putInt("faintBrightness",300).putBoolean("moon",false).putBoolean("nebulae",false).putBoolean("meteors",false).apply());
+        Bitmap deepSky=capture(view,null);
+        runOnMainSync(()->p.edit().putBoolean("deepCatalog",false).apply());Bitmap baseSky=capture(view,null);
+        long[] deepDelta=delta(baseSky,deepSky);check(deepDelta[0]>2000,"Extended catalogue adds visible dark-star pixels: "+deepDelta[0]);deepSky.recycle();baseSky.recycle();
+        runOnMainSync(()->p.edit().putBoolean("deepCatalog",true).putInt("magnitude",9).putInt("faintBrightness",120).putBoolean("moon",true).putBoolean("nebulae",true).apply());
         Bitmap all=capture(view,"qa-celestial-night.png");
         double[] horizontal=app.starfield.wallpaper.CelestialLayer.horizontal(java.time.Instant.parse("2026-10-28T17:30:00Z").toEpochMilli(),29.652,91.172);
         check(horizontal[1]>56&&horizontal[1]<58,"Topocentric lunar altitude agrees with preview");
