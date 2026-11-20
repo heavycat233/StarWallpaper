@@ -58,10 +58,12 @@ python tools/serve_preview.py
 
 在浏览器打开脚本打印的本机地址。预览与安卓直接使用同一份压缩星表；也可以修改 `preview/` 后运行 `python tools/build_preview.py` 再预览。
 
+**深星表对照预览：**打开脚本打印的 `/deep.html` 地址，或直接打开 [深星表预览](preview/star-wallpaper-deep.html)。在“星表对照”中切换 HYG v4.1 与 HYG + AT-HYG v3.2，保持相同时间、位置、视角和亮度。扩展版额外加入 822,917 颗 AT-HYG 恒星，11 等以内共 938,487 颗；多数新增恒星在 9–11 等，建议将星等设为 10 或 11，并调节暗星亮度观察差异。此实验只用于网页预览，现有 Android APK 仍使用 HYG 115,570 颗星。
+
 ## 开发与验证
 
 ```text
-node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs tests/event-math.test.cjs
+node --test tests/sky-math.test.cjs tests/celestial-math.test.cjs tests/event-math.test.cjs tests/deep-catalog.test.cjs
 python tools/verify_android_catalog.py
 python tools/verify_open_source.py
 ```

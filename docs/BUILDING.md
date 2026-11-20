@@ -56,6 +56,8 @@ python tools/serve_preview.py
 
 脚本只监听 `127.0.0.1`，使用支持 Canvas 与 DecompressionStream 的现代浏览器。Ctrl+C 结束服务。片段作为独立浏览器预览时不使用 Codex 的会话偏好保存；调整仍会立即改变画面。
 
+脚本同时提供 `/deep.html` 深星表对照页；也可直接打开 `preview/star-wallpaper-deep.html`。对照页额外加载约 5.3 MB 的 `preview/deep-catalog.js`，合并后的 11 等以内星表约 94 万颗。切换“星表对照”即可在同一画面比较。Android 原生资产仍使用 HYG v4.1，预览合并方案尚未移植到 GLES，也未在手机上评估耗电与帧率。
+
 ## 重新生成天文数据（可选）
 
 普通构建已经有全部离线资产。只有修改数据时才需要以下步骤：
@@ -64,11 +66,12 @@ python tools/serve_preview.py
 | --- | --- |
 | 将预览星表复制到 Android | `python tools/prepare_android_catalog.py`；输入为随仓库附带的 `data/catalogue.b64` |
 | 从原始 HYG CSV 重新量化 | `python tools/prepare_catalog.py`；需从 NOTICE 的 HYG 来源另取 v4.1 CSV，放在 `data/hygdata_v41.csv`。原始大 CSV 不纳入仓库。 |
+| 重建深星表网页预览 | `python tools/download_deep_catalog.py` 下载 AT-HYG v3.2 两份原始 CSV（合计约 199 MB）；`python tools/build_deep_catalog.py` 生成 `preview/deep-catalog.js` 与元数据；再执行 `python tools/build_preview.py`。原始大 CSV 不纳入仓库。 |
 | 重建星云与月面派生数据 | `python tools/prepare_celestials.py`，再 `python tools/prepare_android_celestials.py`；需要 Pillow，输入为已附 OpenNGC CSV 与 NASA 月面图。 |
 | 重建 1900–2101 月球星历 | `node tools/prepare_moon.cjs`；使用已附 Astronomy Engine 2.1.19，无 npm 安装。 |
 | 重建星座连线与名称 | `python tools/build_constellations.py`；输入为已附的 d3-celestial 原始 GeoJSON，输出 Android 与预览共享的 J2000 坐标。 |
 
-修改目录时继续保留 CC BY-SA 许可、来源、修改说明，并更新两端资产和一致性测试。`tools/download_deep_catalog.py` 是旧 AT-HYG 实验脚本，当前构建不运行它。
+修改目录时继续保留 CC BY-SA 许可、来源、修改说明，并更新相关资产和一致性测试。深星表构建是可选的，仅重建网页预览；普通 Android 构建不运行它。
 
 ## 打包开源源码
 

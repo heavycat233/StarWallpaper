@@ -26,6 +26,8 @@
       <div class="sw-segment" aria-label="时钟样式"><button type="button" class="cursor-interaction" data-clock="analog" aria-pressed="true"><i data-lucide="clock-3" aria-hidden="true"></i> 传统指针</button><button type="button" class="cursor-interaction" data-clock="digital" aria-pressed="false"><i data-lucide="hash" aria-hidden="true"></i> 数字时钟</button></div>
       <div class="sw-row-label">界面显示</div>
       <div class="sw-segment" role="group" aria-label="界面显示"><button type="button" class="cursor-interaction" data-ui-mode="standard" aria-pressed="false">标准版</button><button type="button" class="cursor-interaction" data-ui-mode="minimal" aria-pressed="true">精简版</button></div>
+      <div class="sw-control sw-deep-only" hidden><label for="sw-catalogue">星表对照</label><select id="sw-catalogue" aria-label="星表对照"><option value="athyg">深星表 · HYG + AT-HYG</option><option value="hyg">原星表 · HYG v4.1</option></select><div class="sw-range-labels"><span>相同日期、视角与亮度直接比较</span></div></div>
+      <p class="sw-annotation-note sw-deep-only" hidden>深星表额外加入 AT-HYG v3.2 中约 82 万颗恒星，合计约 94 万颗（V≤11）。Tycho 亮度按 ESA 公式换算。当前 APK 仍使用 HYG；此处只比较网页效果。</p>
       <div class="sw-control"><label for="sw-magnitude">星等上限 <output id="sw-mag-value">8 等</output></label><input id="sw-magnitude" aria-label="星等上限" type="range" min="3" max="11" step="1" value="8"><div class="sw-range-labels"><span>3 · 明亮简洁</span><span>11 · 深邃繁星</span></div></div>
       <div class="sw-control"><label for="sw-faint-brightness">暗星亮度 <output id="sw-faint-value">180%</output></label><input id="sw-faint-brightness" aria-label="暗星亮度" type="range" min="50" max="400" step="10" value="180"><div class="sw-range-labels"><span>100% · 原始亮度</span><span>增强 6–11 等暗星</span></div></div>
       <div class="sw-control"><label for="sw-bright-size">亮星星点 <output id="sw-bright-value">75%</output></label><input id="sw-bright-size" aria-label="亮星星点大小" type="range" min="50" max="100" step="5" value="75"><div class="sw-range-labels"><span>更纤细</span><span>100% · 原大小</span></div></div>
@@ -78,6 +80,7 @@
 #starwall-preview *{box-sizing:border-box}
 #starwall-preview [hidden]{display:none!important}
 #starwall-preview[data-ui-mode=minimal] .sw-status,#starwall-preview[data-ui-mode=minimal] .sw-clock-caption,#starwall-preview[data-ui-mode=minimal] .sw-horizon-label,#starwall-preview[data-ui-mode=minimal] .sw-bottom,#starwall-preview[data-ui-mode=minimal] .sw-gesture,#starwall-preview[data-ui-mode=minimal] .sw-caption{display:none!important}
+#starwall-preview[data-deep-preview=true][data-ui-mode=minimal] .sw-caption{display:flex!important}
 #starwall-preview .sw-annotation-note{font-size:10px;color:var(--sw-muted);margin:-12px 0 18px}
 #starwall-preview button,#starwall-preview input,#starwall-preview select{font:inherit}
 #starwall-preview .sw-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
@@ -167,6 +170,7 @@
 #starwall-preview .sw-zone-control{display:block;margin-bottom:14px}
 #starwall-preview .sw-data-note>div{font-size:10px;line-height:1.8;margin-top:10px}
 #starwall-preview .sw-error{color:#ffb3ab;font-size:11px;line-height:1.7;margin:8px 0}
+#starwall-preview .sw-deep-only[hidden]{display:none!important}
 @media(max-width:590px){#starwall-preview{padding:19px 16px}#starwall-preview .sw-layout{grid-template-columns:1fr;gap:28px}#starwall-preview .sw-platform{padding-right:65px;font-size:9px}#starwall-preview .sw-settings{width:100%;max-width:380px;margin:auto}#starwall-preview .sw-phone{max-width:310px}#starwall-preview .sw-segment button{font-size:13px}#starwall-preview .sw-control>label,#starwall-preview .sw-row-label{font-size:13px}#starwall-preview .sw-range-labels,#starwall-preview details,#starwall-preview .sw-switches label,#starwall-preview .sw-timezone-label{font-size:11px}#starwall-preview .sw-data-note>div{font-size:11px}#starwall-preview .sw-switches label{min-height:44px}#starwall-preview select,#starwall-preview input[type=datetime-local],#starwall-preview input[type=number]{font-size:16px}#starwall-preview summary{min-height:36px}#starwall-preview .sw-control{margin-bottom:22px}}
 @media(prefers-reduced-motion:reduce){#starwall-preview *{transition:none!important}}
 @media(pointer:coarse){#starwall-preview input[type=range]{height:44px}#starwall-preview .sw-segment button,#starwall-preview .sw-compass button,#starwall-preview .sw-switches label,#starwall-preview summary,#starwall-preview select,#starwall-preview input[type=datetime-local],#starwall-preview input[type=number],#starwall-preview .sw-now{min-height:44px}#starwall-preview input[type=datetime-local],#starwall-preview input[type=number],#starwall-preview select{font-size:16px}}
@@ -179,4 +183,5 @@
 <!-- EVENTS_DATA -->
 <!-- EVENTS_MATH -->
 <!-- CELESTIAL_MATH -->
+<!-- DEEP_DATA -->
 <!-- PREVIEW_SCRIPT -->

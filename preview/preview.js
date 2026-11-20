@@ -12,12 +12,15 @@
     atacama: { name: '阿塔卡马', lat: -23.023, lon: -67.755, zone: 'America/Santiago' },
     reykjavik: { name: '雷克雅未克', lat: 64.1466, lon: -21.9426, zone: 'Atlantic/Reykjavik' }
   };
-  const state = { clock: 'digital', uiMode: 'minimal', magnitude: 8, faintBrightness: 180, brightSize: 75, nebulae: true, nebulaBrightness: 140, nebulaSize: 250, galaxies:true, galaxyBrightness:180, galaxySize:200, moon: true, moonSize: 8, meteors:true, meteorDensity:100, zodiacalLight:false, zodiacalBrightness:100, example: false, celestialSceneVersion: 1, fov: 147, glow: 148, dust: 50, twinkle: !matchMedia('(prefers-reduced-motion: reduce)').matches, twinkleStrength: 140, labels: false, constellations: false, city: 'lhasa', ...cities.lhasa, azimuth: 270, altitude: 90, live: true, epoch: Date.now() };
+  const state = { clock: 'digital', uiMode: 'minimal', catalogue:window.STAR_DEEP_PREVIEW?'athyg':'hyg', magnitude:window.STAR_DEEP_PREVIEW?11:8, faintBrightness: 180, brightSize: 75, nebulae: true, nebulaBrightness: 140, nebulaSize: 250, galaxies:true, galaxyBrightness:180, galaxySize:200, moon: true, moonSize: 8, meteors:true, meteorDensity:100, zodiacalLight:false, zodiacalBrightness:100, example: false, celestialSceneVersion: 1, fov: 147, glow: 148, dust: 50, twinkle: !matchMedia('(prefers-reduced-motion: reduce)').matches, twinkleStrength: 140, labels: false, constellations: false, city: 'lhasa', ...cities.lhasa, azimuth: 270, altitude: 90, live: true, epoch: Date.now() };
+  if (window.STAR_DEEP_PREVIEW) root.dataset.deepPreview = 'true';
   const design = { clockScale: 100, clockTop: 13, ink: '#f2eddf' };
   let records = [], visible = [], namedVisible = [], camera, busy = false, frame = 0, lastFrame = -Infinity, lastGeometry = 0, timer, width = 320, height = 680, dpr = 1, destroyed = false;
   const baseCanvas = $('.sw-sky'), dynamicCanvas = $('.sw-stars');
   const ctx = baseCanvas.getContext('2d'), dyn = dynamicCanvas.getContext('2d');
   const staticStars = document.createElement('canvas'), sctx = staticStars.getContext('2d');
+  const deepCanvas = document.createElement('canvas'), deepCtx = deepCanvas.getContext('2d');
+  let deepStars = null;
   const galaxyCanvas = document.createElement('canvas'), gctx = galaxyCanvas.getContext('2d');
   const horizonCanvas = document.createElement('canvas'), hctx = horizonCanvas.getContext('2d');
   const nebulaCanvas = document.createElement('canvas'), nctx = nebulaCanvas.getContext('2d');
@@ -50,7 +53,7 @@
   function error(message = '') { $('.sw-error').hidden = !message; $('.sw-error').textContent = message; }
   function remember() {
     const data = { ...state, epoch: state.live ? null : state.epoch };
-    const snapshot = { modelContent: { clock: state.clock, uiMode: state.uiMode, magnitude: state.magnitude, faintBrightness: state.faintBrightness, brightSize: state.brightSize, nebulae: state.nebulae, nebulaBrightness: state.nebulaBrightness, nebulaSize: state.nebulaSize, galaxies:state.galaxies,galaxyBrightness:state.galaxyBrightness,galaxySize:state.galaxySize,moon: state.moon, moonSize: state.moonSize, meteors:state.meteors,meteorDensity:state.meteorDensity,zodiacalLight:state.zodiacalLight,zodiacalBrightness:state.zodiacalBrightness,example: state.example, celestialSceneVersion: 1, fov: state.fov, city: state.city, location: state.name, latitude: state.lat, longitude: state.lon, timezone: state.zone, live: state.live, date: state.live ? '实时' : new Date(state.epoch).toISOString(), glow: state.glow, dust: state.dust, twinkle: state.twinkle, twinkleStrength: state.twinkleStrength, labels: state.labels, constellations: state.constellations, azimuth: state.azimuth, altitude: state.altitude, viewingDirection: state.altitude === 90 ? '天顶' : directions(state.azimuth) }, privateContent: { settings: data, design: { ...design }, returnView } };
+    const snapshot = { modelContent: { clock: state.clock, uiMode: state.uiMode, catalogue:state.catalogue, magnitude: state.magnitude, faintBrightness: state.faintBrightness, brightSize: state.brightSize, nebulae: state.nebulae, nebulaBrightness: state.nebulaBrightness, nebulaSize: state.nebulaSize, galaxies:state.galaxies,galaxyBrightness:state.galaxyBrightness,galaxySize:state.galaxySize,moon: state.moon, moonSize: state.moonSize, meteors:state.meteors,meteorDensity:state.meteorDensity,zodiacalLight:state.zodiacalLight,zodiacalBrightness:state.zodiacalBrightness,example: state.example, celestialSceneVersion: 1, fov: state.fov, city: state.city, location: state.name, latitude: state.lat, longitude: state.lon, timezone: state.zone, live: state.live, date: state.live ? '实时' : new Date(state.epoch).toISOString(), glow: state.glow, dust: state.dust, twinkle: state.twinkle, twinkleStrength: state.twinkleStrength, labels: state.labels, constellations: state.constellations, azimuth: state.azimuth, altitude: state.altitude, viewingDirection: state.altitude === 90 ? '天顶' : directions(state.azimuth) }, privateContent: { settings: data, design: { ...design }, returnView } };
     if (window.openai?.setWidgetState) window.openai.setWidgetState(snapshot).catch(() => {});
   }
   function restore(snapshot) {
@@ -63,6 +66,7 @@
     }
     if (input.clock === 'analog' || input.clock === 'digital') state.clock = input.clock;
     if (input.uiMode === 'standard' || input.uiMode === 'minimal') state.uiMode = input.uiMode;
+    if (window.STAR_DEEP_CATALOGUE && (input.catalogue === 'athyg' || input.catalogue === 'hyg')) state.catalogue = input.catalogue;
     if (cities[input.city] || input.city === 'custom') state.city = input.city;
     if (typeof input.name === 'string') state.name = input.name.slice(0, 30);
     for (const key of ['twinkle', 'labels', 'constellations', 'live', 'nebulae', 'galaxies','moon','meteors','zodiacalLight', 'example']) if (typeof input[key] === 'boolean') state[key] = input[key];
@@ -83,6 +87,8 @@
   function directions(az) { return ['北', '东北', '东', '东南', '南', '西南', '西', '西北'][Math.round(az / 45) % 8]; }
   function syncControls() {
     const minimal = state.uiMode === 'minimal';
+    root.querySelectorAll('.sw-deep-only').forEach(element=>element.hidden=!window.STAR_DEEP_PREVIEW);
+    if(window.STAR_DEEP_PREVIEW)$('#sw-catalogue').value=state.catalogue;
     root.dataset.uiMode = state.uiMode;
     root.querySelectorAll('[data-ui-mode]').forEach(button => button.setAttribute('aria-pressed', button.dataset.uiMode === state.uiMode));
     for (const [id, key] of [['sw-magnitude', 'magnitude'], ['sw-faint-brightness', 'faintBrightness'], ['sw-bright-size','brightSize'], ['sw-nebula-brightness','nebulaBrightness'], ['sw-nebula-size','nebulaSize'],['sw-galaxy-brightness','galaxyBrightness'],['sw-galaxy-size','galaxySize'],['sw-meteor-density','meteorDensity'],['sw-zodiacal-brightness','zodiacalBrightness'], ['sw-moon-size','moonSize'], ['sw-fov', 'fov'], ['sw-glow', 'glow'], ['sw-dust', 'dust'], ['sw-twinkle-strength', 'twinkleStrength'], ['sw-azimuth', 'azimuth'], ['sw-altitude', 'altitude'], ['sw-lat', 'lat'], ['sw-lon', 'lon'], ['sw-city', 'city'], ['sw-zone', 'zone']]) $('#' + id).value = state[key];
@@ -364,6 +370,45 @@
     }
     ctx.textAlign='start';
   }
+  function paintDeepStars(){
+    if(!deepStars||state.catalogue!=='athyg')return 0;
+    const pixelWidth=deepCanvas.width,pixelHeight=deepCanvas.height;
+    const image=deepCtx.createImageData(pixelWidth,pixelHeight),pixels=image.data;
+    const light=new Float32Array(pixelWidth*pixelHeight*3);
+    const palette=[[174,198,255],[204,218,255],[239,236,225],[250,221,184],[255,190,151]];
+    const luminosity=new Float32Array(256),scale=Math.max(.85,width/320);
+    for(let code=0;code<256;code++){
+      const magnitude=code/16-2,t=M.clamp((magnitude-5)/3,0,1),gain=1+(state.faintBrightness/100-1)*t*t*(3-2*t);
+      const size=Math.max(.28,1.7-magnitude*.17)*scale*dpr;
+      luminosity[code]=M.clamp(1.6*Math.pow(10,-.115*Math.max(-1,magnitude)),.08,1)*gain*Math.min(1,Math.PI*size*size);
+    }
+    const local=camera.local,right=camera.right,up=camera.up,center=camera.center;
+    const transform=axis=>[axis[0]*local[0][0]+axis[1]*local[1][0]+axis[2]*local[2][0],axis[0]*local[0][1]+axis[1]*local[1][1]+axis[2]*local[2][1],axis[0]*local[0][2]+axis[1]*local[1][2]+axis[2]*local[2][2]];
+    const R=transform(right),U=transform(up),C=transform(center),H=local[2],vectors=deepStars.vectors,mags=deepStars.mags,colors=deepStars.colors;
+    const add=(x,y,amount,rgb)=>{if(x<0||y<0||x>=pixelWidth||y>=pixelHeight)return;const index=(y*pixelWidth+x)*3;light[index]+=rgb[0]*amount;light[index+1]+=rgb[1]*amount;light[index+2]+=rgb[2]*amount;};
+    let shown=0;
+    for(let i=0;i<deepStars.count;i++){
+      const code=mags[i];if(code/16-2>state.magnitude)break;
+      const j=i*3,vx=vectors[j],vy=vectors[j+1],vz=vectors[j+2];
+      if(H[0]*vx+H[1]*vy+H[2]*vz<=0)continue;
+      const z=C[0]*vx+C[1]*vy+C[2]*vz;if(z<-.001)continue;
+      const x=R[0]*vx+R[1]*vy+R[2]*vz,y=U[0]*vx+U[1]*vy+U[2]*vz;
+      const radius=Math.hypot(x,y),factor=radius<1e-10?camera.scale:camera.scale*Math.acos(M.clamp(z,-1,1))/radius;
+      const sx=width*.5+x*factor,sy=height*.5-y*factor;if(sx<0||sx>=width||sy<0||sy>=height)continue;
+      shown++;
+      const fx=sx*dpr-.5,fy=sy*dpr-.5,ix=Math.floor(fx),iy=Math.floor(fy),tx=fx-ix,ty=fy-iy;
+      const bv=colors[i]/64-.5,rgb=palette[bv<0?0:bv<.4?1:bv<.85?2:bv<1.4?3:4],power=luminosity[code];
+      add(ix,iy,power*(1-tx)*(1-ty),rgb);add(ix+1,iy,power*tx*(1-ty),rgb);
+      add(ix,iy+1,power*(1-tx)*ty,rgb);add(ix+1,iy+1,power*tx*ty,rgb);
+    }
+    for(let i=0,j=0;i<light.length;i+=3,j+=4){
+      if(light[i]+light[i+1]+light[i+2]<=0)continue;
+      pixels[j]=Math.min(255,light[i]);pixels[j+1]=Math.min(255,light[i+1]);pixels[j+2]=Math.min(255,light[i+2]);pixels[j+3]=255;
+    }
+    deepCtx.putImageData(image,0,0);
+    ctx.globalCompositeOperation='screen';ctx.drawImage(deepCanvas,0,0,width,height);ctx.globalCompositeOperation='source-over';
+    return shown;
+  }
   function rebuild() {
     if (busy || !records.length || destroyed) return;
     busy = true;
@@ -388,6 +433,7 @@
         const p = M.project(M.equatorial(n[1], n[2]), camera);
         if (p && p[0] > 5 && p[0] < width - 5 && p[1] > 12 && p[1] < height - 12) namedVisible.push([p[0], p[1], chineseNames[n[0]] || n[0]]);
       }
+      const extra=paintDeepStars();shown+=extra;root.dataset.deepCount=String(extra);
       ctx.drawImage(staticStars, 0, 0, width, height);
       if (state.constellations && state.uiMode !== 'minimal') paintConstellations();
       if (state.labels && state.uiMode !== 'minimal') {
@@ -401,7 +447,7 @@
         if(state.galaxies)for(const galaxy of galaxies){const p=M.project(M.equatorial(galaxy.ra,galaxy.dec),camera);if(p&&p[0]>8&&p[0]<width-75&&p[1]>12&&p[1]<height-12)ctx.fillText(galaxy.name,p[0]+7,p[1]-5);}
       }
       paintMoon();
-      $('.sw-render-status').textContent = `当前视野 ${shown.toLocaleString('zh-CN')} 颗恒星 · ${state.magnitude} 等 / ${state.fov}°`;
+      $('.sw-render-status').textContent = `当前视野 ${shown.toLocaleString('zh-CN')} 颗恒星 · ${state.catalogue==='athyg'?'HYG + AT-HYG':'HYG'} · ${state.magnitude} 等 / ${state.fov}°`;
       root.dataset.starCount = String(shown); root.dataset.rendered = 'true';
       lastGeometry = performance.now();
       paintDynamic(performance.now());
@@ -495,6 +541,7 @@
   }
   root.querySelectorAll('[data-clock]').forEach(button => button.addEventListener('click', () => { state.clock = button.dataset.clock; changed(false); }));
   root.querySelectorAll('[data-ui-mode]').forEach(button => button.addEventListener('click', () => { state.uiMode = button.dataset.uiMode; changed(); }));
+  $('#sw-catalogue').addEventListener('change',event=>{state.catalogue=event.target.value;changed();});
   root.querySelectorAll('[data-azimuth]').forEach(button => button.addEventListener('click', () => {
     state.azimuth = Number(button.dataset.azimuth);
     if (state.altitude === 90) state.altitude = 45;
@@ -540,7 +587,7 @@
     const rect = entries[0].contentRect;
     if (rect.width < 1 || rect.height < 1) return;
     width = rect.width; height = rect.height; dpr = Math.min(window.devicePixelRatio || 1, 2);
-    for (const c of [baseCanvas, dynamicCanvas, staticStars, nebulaCanvas]) { c.width = Math.round(width * dpr); c.height = Math.round(height * dpr); }
+    for (const c of [baseCanvas, dynamicCanvas, staticStars, deepCanvas, nebulaCanvas]) { c.width = Math.round(width * dpr); c.height = Math.round(height * dpr); }
     galaxyKey = ''; rebuild();
   });
   resize.observe($('.sw-phone'));
@@ -555,6 +602,21 @@
       const ra = (view[i]|view[N+i]<<8) / 65535 * 24, dec = ((view[N*2+i]|view[N*3+i]<<8)<<16>>16) / 32767 * 90;
       const mag = view[N*4+i] / 16 - 2, bv = view[N*5+i] / 64 - .5;
       records.push({ vector: M.equatorial(ra, dec), mag, color: color(bv) });
+    }
+    if(window.STAR_DEEP_PREVIEW&&!window.STAR_DEEP_CATALOGUE)throw new Error('缺少 deep-catalog.js，请从同一目录打开完整深星表预览');
+    if(window.STAR_DEEP_CATALOGUE){
+      $('.sw-render-status').textContent='正在展开 AT-HYG 深星表…';
+      try{
+        const supplement=window.STAR_DEEP_CATALOGUE,compressed=Uint8Array.from(atob(supplement.data),c=>c.charCodeAt(0));
+        const raw=new Uint8Array(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+        const count=supplement.count;if(raw.byteLength!==count*6)throw new Error('深星表长度不符');
+        const vectors=new Float32Array(count*3),mags=raw.slice(count*4,count*5),colors=raw.slice(count*5,count*6);
+        for(let i=0;i<count;i++){
+          const ra=(raw[i]|raw[count+i]<<8)/65535*24,dec=((raw[count*2+i]|raw[count*3+i]<<8)<<16>>16)/32767*90;
+          const vector=M.equatorial(ra,dec),j=i*3;vectors[j]=vector[0];vectors[j+1]=vector[1];vectors[j+2]=vector[2];
+        }
+        deepStars={count,vectors,mags,colors};root.dataset.deepLoaded='true';
+      }catch(problem){state.catalogue='hyg';root.dataset.deepLoaded='false';error(`深星表未能载入：${problem.message}`);}
     }
     const textureBytes=Uint8Array.from(atob(celestialData.moonTexture.data),c=>c.charCodeAt(0));
     moonTexture=new Uint8Array(await new Response(new Blob([textureBytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());

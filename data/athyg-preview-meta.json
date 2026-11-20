@@ -1,0 +1,31 @@
+{
+  "source": "AT-HYG v3.2 (Tycho-2, Gaia DR3 and HYG); HYG v4.1 base",
+  "rawRows": 2552165,
+  "additionalCount": 822917,
+  "baseCount": 115570,
+  "combinedCount": 938487,
+  "counts": {
+    "3": 0,
+    "4": 0,
+    "5": 2,
+    "6": 4,
+    "7": 95,
+    "8": 4462,
+    "9": 46820,
+    "10": 245767,
+    "11": 822917
+  },
+  "recordBytes": 6,
+  "packedLayout": "byte-planes",
+  "magSources": {
+    "T": 822917
+  },
+  "selection": "AT-HYG rows without HYG cross-reference, approximate Johnson V <= 11",
+  "photometry": "For Tycho mag_src=T, V=VT-0.090*(BT-VT), B-V=0.850*(BT-VT); ESA SP-1200 approximation",
+  "license": "CC BY-SA 4.0; David Nash / Astronomy Nexus, AT-HYG contributors",
+  "sourceSha256": {
+    "athyg_v32-1.csv.gz": "c71d6863d1bbab46511bf680209e424ece9435790e46025f12477a105edd1c2f",
+    "athyg_v32-2.csv.gz": "bd8fe86f089c7fd3104761458cd2b0c9955ea97259440585164e4b24ed9d2fd8"
+  },
+  "encodedBytes": 5286048
+}

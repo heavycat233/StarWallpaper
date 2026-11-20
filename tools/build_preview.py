@@ -24,6 +24,10 @@ fragment = fragment.replace('<!-- EVENTS_MATH -->','<script>\n'+(ROOT/'preview/e
 fragment = fragment.replace('<!-- CELESTIAL_MATH -->','<script>\n'+(ROOT/'preview/celestial-math.js').read_text(encoding='utf-8')+'\n</script>')
 fragment = fragment.replace('<!-- PREVIEW_SCRIPT -->', '<script>\n' + (ROOT / 'preview/preview.js').read_text(encoding='utf-8') + '\n</script>')
 out = ROOT / 'preview/star-wallpaper.html'
-out.write_text(fragment, encoding='utf-8')
+out.write_text(fragment.replace('<!-- DEEP_DATA -->',''), encoding='utf-8')
 assert out.stat().st_size < 1_000_000, out.stat().st_size
 print(f'Built {out} ({out.stat().st_size:,} bytes)')
+deep = ROOT / 'preview/star-wallpaper-deep.html'
+deep.write_text(fragment.replace('<!-- DEEP_DATA -->','<script>window.STAR_DEEP_PREVIEW=true;</script><script src="deep-catalog.js"></script>'), encoding='utf-8')
+assert deep.stat().st_size < 1_000_000, deep.stat().st_size
+print(f'Built {deep} ({deep.stat().st_size:,} bytes; external AT-HYG supplement)')
